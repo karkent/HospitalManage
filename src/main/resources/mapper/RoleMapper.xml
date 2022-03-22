@@ -1,0 +1,117 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cykj.hospitalsystem.mapper.RoleMapper">
+    <select id="totalCum" resultType="int" parameterType="Map">
+        select count(*) from tblrole
+        <where>
+            1 = 1
+            <if test="rolename!=null and rolename!=''">
+                and rolename like concat('%',#{rolename},'%')
+            </if>
+            <if test="rolecode!=null and rolecode!=''">
+                and rolecode like concat('%',#{rolecode},'%')
+            </if>
+            <if test="rolestateStr!=null and rolestateStr!=''">
+                and rolestate like concat('%',#{rolestateStr},'%')
+            </if>
+            <if test="rremarks!=null and rremarks!=''">
+                or rremarks like concat('%',#{rremarks},'%')
+            </if>
+        </where>
+    </select>
+    <select id="find" resultMap="roleAndData" parameterType="Map">
+        select * from tblrole r left join tbldata d on r.rolestate=d.dataid
+        <where>
+            1 = 1
+            <if test="isNotAll!='' and isNotAll!=null">
+                and r.roleid !=#{isNotAll}
+            </if>
+            <if test="rolename!=null and rolename!=''">
+                and r.rolename like concat('%',#{rolename},'%')
+            </if>
+            <if test="rolecode!=null and rolecode!=''">
+                and r.rolecode like concat('%',#{rolecode},'%')
+            </if>
+            <if test="rolestateStr!=null and rolestateStr!=''">
+                and r.rolestate like concat('%',#{rolestateStr},'%')
+            </if>
+            <if test="rremarks!=null and rremarks!=''">
+                or r.rremarks like concat('%',#{rremarks},'%')
+            </if>
+        </where>
+        order by r.roleid desc limit #{nowPage},#{pageSize}
+    </select>
+    <resultMap id="roleAndData" type="Tblrole">
+        <id property="roleid" column="roleid"></id>
+        <result property="rolename" column="rolename"></result>
+        <result property="rolecode" column="rolecode"></result>
+        <result property="rolestate" column="rolestate"></result>
+        <result property="rremarks" column="rremarks"></result>
+        <association property="tbldata" javaType="Tbldata">
+            <result property="dataname" column="dataname"/>
+        </association>
+    </resultMap>
+    <update id="updateRole" parameterType="Map">
+        update tblrole
+        <set>
+            <if test="rolename!=null and rolename!=''">rolename=#{rolename},</if>
+            <if test="rolecode!=null and rolecode!=''">rolecode=#{rolecode},</if>
+            <if test="rolestate!=null and rolestate!=''">rolestate=#{rolestate},</if>
+            <if test="rremarks!=null and rremarks!=''">rremarks=#{rremarks}</if>
+        </set>
+        where roleid=#{roleid}
+    </update>
+<!--    根据批量角色id  修改-->
+    <update id="setBatchState">
+        update tblrole
+        <set>
+            <if test="map.rolestate!=null and map.rolestate!=''">rolestate=#{map.rolestate},</if>
+            <if test="map.rolename!=null and map.rolename!=''">rolename=#{map.rolename},</if>
+            <if test="map.rremarks!=null and map.rremarks!=''">rremarks=#{map.rremarks}</if>
+        </set>
+        where rolestate &lt;&gt; 4 and roleid in
+        <foreach item="item" index="index" collection="map.roleidArray" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </update>
+
+    <select id="findMaxId" resultType="int">
+        select MAX(roleid) from tblrole
+    </select>
+    <select id="getRoleByName" resultType="int" parameterType="java.lang.String">
+        select count(*) from tblrole where rolename=#{rolename}
+    </select>
+    <select id="getId" resultType="int" parameterType="Map">
+        select roleid from tblrole where rolecode=#{rolecode}
+    </select>
+    <insert id="addRole" parameterType="Map">
+        insert into tblrole(rolename,rolecode,rolestate,rremarks)
+        values(#{rolename},#{rolecode},2,#{rremarks})
+    </insert>
+
+    <select id="getAllRole" resultType="Tblrole">
+        select roleid,rolename from tblrole
+        where roleid != 1
+        order by case
+        when roleid=29 then 0 else roleid end
+    </select>
+
+
+    <select id="RoleStaff" resultMap="stafflist">
+        select ts2.sname,tmp2.rolename,ts2.staffid,tmp2.roleid from tblstaff ts2 RIGHT JOIN
+        (select tmp.rolename,tmp.roleid,tmp.staffid from
+        (select tr.rolename,tr.roleid,tsr.staffid from tblrole tr
+        LEFT JOIN tblstaffRole tsr on tsr.roleid = tr.roleid)AS tmp) as tmp2 on ts2.staffid = tmp2.staffid
+    </select>
+    <resultMap id="stafflist" type="Tblrole">
+        <result property="rolename" column="rolename"></result>
+        <result property="label" column="rolename"></result>
+        <collection property="children" ofType="Tblstaff">
+            <id property="staffid" column="staffid"></id>
+            <result property="sname" column="sname"></result>
+            <result property="label" column="sname"></result>
+        </collection>
+    </resultMap>
+</mapper>

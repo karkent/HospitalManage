@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cykj.hospitalsystem.mapper.WasteTableMapper">
+    <select id="getWasteTableInfo" resultType="WasteTableInfo" parameterType="Map">
+				select
+				(
+				select ts.sname from  tbltrashin tts
+				LEFT JOIN tblmedicaltype tmt  on tmt.infoid = tts.infoid
+				left join tblstaff ts on tmt.collectid = ts.staffid
+				where tts.enterdate between #{startdate} and #{enddate}
+				order by tts.enterdate desc
+				limit 0,1
+				)as collectName,
+				(
+				select ts.sname from  tbltrashin tts
+				LEFT JOIN tblmedicaltype tmt  on tmt.infoid = tts.infoid
+				left join tblstaff ts on tts.enterid = ts.staffid
+				where tts.enterdate between #{startdate} and #{enddate}
+				order by tts.enterdate desc
+				limit 0,1
+				) as enterName,
+				tts.enterdate inDate from  tbltrashin tts
+				LEFT JOIN tblmedicaltype tmt on tmt.infoid = tts.infoid
+				where tts.enterdate between #{startdate} and #{enddate}
+				group by tts.enterdate
+				order by tts.enterdate desc
+				limit 0,1
+    </select>
+</mapper>

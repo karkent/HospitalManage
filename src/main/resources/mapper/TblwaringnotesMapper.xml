@@ -1,0 +1,150 @@
+<?xml version='1.0' encoding='UTF-8'?>
+
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cykj.hospitalsystem.mapper.TblwaringnotesMapper">
+
+    <insert id="addnote" parameterType="java.util.List">
+        INSERT INTO tblwaringnotes(handlestate,warningtype,warninglink,bagcode,kid,
+        wcase,wtime,hid) VALUES
+        <foreach collection="list" item="item" separator=",">
+            (#{item.handlestate},#{item.warningtype},#{item.warninglink},#{item.bagcode},#{item.kid},
+            #{item.wcase},#{item.wtime},#{item.hid})
+        </foreach>
+    </insert>
+    <select id="findAll" resultMap="waringMap">
+        select wn.noteid,wn.handlestate,hi.hname,dm.dname,td.dataname
+        from tblwaringnotes wn left join tblhospitalinfo hi on hi.hid=wn.hid
+        left join tbldepartrment dm on dm.did = wn.kid
+        left join tbldata td on td.dataid = wn.warningtype
+        where wn.handlestate = 0
+        order by wn.noteid desc
+    </select>
+    <resultMap id="waringMap" type="Tblwaringnotes">
+        <id property="noteid" column="noteid"></id>
+        <result property="handlestate" column="handlestate"></result>
+        <association property="departrment" javaType="Tbldepartrment">
+            <result property="dname" column="dname"></result>
+        </association>
+        <association property="tbldata" javaType="Tbldata">
+            <result property="dataname" column="dataname"></result>
+        </association>
+        <association property="hospital" javaType="Tblhospitalinfo">
+            <result property="hname" column="hname"></result>
+        </association>
+    </resultMap>
+    <select id="countRows" resultType="int">
+        select count(*) from tblwaringnotes where handlestate = 0
+    </select>
+    <insert id="addnoteByMap">
+        insert into tblwaringnotes(handlestate,warningtype,warninglink,
+        bagcode,hid,wcase,wtime,kid) VALUES
+        <foreach collection="map.medicaltypeList" item="item" separator=",">
+            (#{map.handlestate},#{map.warningtype},#{map.warninglink},
+            #{item.bagcode},#{item.hid},#{map.wcase},#{map.nowdate},#{item.did})
+        </foreach>
+    </insert>
+
+
+    <update id="setWeightWaringState">
+        update tblmedicaltype
+        <set>
+            <if test="map.spare1!=null and map.spare1!=''">
+                spare1 = #{map.spare1},
+            </if>
+            <if test="map.spare2!=null and map.spare2!=''">
+                spare2 = #{map.spare2}
+            </if>
+        </set>
+        where infoid in
+        <foreach item="item" collection="map.medicaltypeList" open="(" separator="," close=")">
+            #{item.infoid}
+        </foreach>
+    </update>
+<!--    删除预警表中的所有重量预警的信息 -->
+    <delete id="delInStockWeightWaring" parameterType="Map">
+        delete from tblwaringnotes where warningtype = #{warningtype} and warninglink=#{warninglink}
+    </delete>
+
+
+<!--    状态7代表已入库，spare1代表是否已经交接预警了，不等于0 则代表未生成预警信息-->
+    <select id="OutOvertime" parameterType="Map" resultType="Tblmedicaltype">
+        select * from tblmedicaltype mct
+        left join tbltrashin ta on ta.infoid = mct.infoid
+        where 1 = 1
+        and mct.state=7
+        and ta.enterdate &lt;= #{dateStr}
+        and (ta.spare1 &lt;&gt; 1 or ta.spare1 is null)
+    </select>
+
+    <!--    删除预警表中的交接超时的预警信息 -->
+    <delete id="delOutStockOvertimeWaring">
+        delete from tblwaringnotes where warningtype = 30
+    </delete>
+
+
+    <update id="setOutStockOvertimeWaringState">
+        update tbltrashin
+        <set>
+            spare1 = 1
+        </set>
+        where infoid in
+        <foreach item="item" collection="map.medicaltypeList" open="(" separator="," close=")">
+            #{item.infoid}
+        </foreach>
+    </update>
+
+    <!-- 预警列表查询 -->
+    <select id="findParam" resultType="com.cykj.hospitalsystem.bean.Tblwaringnotes" parameterType="Map">
+        select wn.noteid,td.dataname,wn.wcase,wn.handlestate,wn.warninglink,wn.wtime,wn.handleman,wn.handleidea,wn.handletime,hi.hname,dm.dname,st.sname
+        from tblwaringnotes wn left join tblhospitalinfo hi on hi.hid=wn.hid
+        left join tbldepartrment dm on dm.did = wn.kid
+        left join tbldata td on td.dataid = wn.warningtype
+        left join tblstaff st on st.staffid = wn.handleman
+        <where>
+            <if test="handlestate != null and handlestate != ''">
+                wn.handlestate = #{handlestate}
+            </if>
+            <if test="beginTime!= null and beginTime != '' and endTime != null and endTime != ''">
+                and (wn.wtime between #{beginTime} and #{endTime})
+            </if>
+            <if test="warninglink != null and warninglink != ''">
+                and wn.warninglink = #{warninglink}
+            </if>
+            <if test="hname!= null and hname != '' and hname gt 0">
+                and wn.hid = #{hname}
+            </if>
+        </where>
+        order by wn.noteid desc
+        limit #{nowPage} , #{pageSize}
+    </select>
+
+    <!-- 预警列表查询 -->
+    <select id="findParamCount" resultType="java.lang.Integer" parameterType="Map">
+        select count(*)
+        from tblwaringnotes wn
+        <where>
+            <if test="handlestate != null and handlestate != ''">
+                wn.handlestate = #{handlestate}
+            </if>
+            <if test="beginTime!= null and beginTime != '' and endTime != null and endTime != ''">
+                and (wn.wtime between #{beginTime} and #{endTime})
+            </if>
+            <if test="warninglink != null and warninglink != ''">
+                and wn.warninglink = #{warninglink}
+            </if>
+            <if test="hname!= null and hname != '' and hname gt 0">
+                and wn.hid = #{hname}
+            </if>
+        </where>
+    </select>
+    <update id="updateHandle" parameterType="Map">
+        update tblwaringnotes
+        set handlestate = 1 ,
+            handleman = #{handleman},
+            handleidea = #{handleidea},
+            handletime = #{handletime}
+        where noteid = #{noteid}
+    </update>
+</mapper>

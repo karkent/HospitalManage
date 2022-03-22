@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cykj.hospitalsystem.mapper.TrashTypeMapper">
+
+    <select id="seltype" resultType="Tbltypeprint" parameterType="Map">
+        select * from tbltypeprint
+    </select>
+
+    <select id="selTrashList" resultMap="trashTypeAndData" parameterType="Map">
+        select * from tbltypeprint t left join tbldata d on t.tstate=d.dataid
+        <where>
+            1 = 1
+            <if test="tname!=null and tname!=''">
+                and t.tname like concat('%',#{tname},'%')
+            </if>
+            <if test="dstateStr!=null and dstateStr!=''">
+                and t.tstate =#{dstateStr}
+            </if>
+        </where>
+        order by t.tid desc limit #{nowPage},#{pageSize}
+    </select>
+    <resultMap id="trashTypeAndData" type="Tbltypeprint">
+        <id property="tid" column="tid"></id>
+        <result property="tname" column="tname"></result>
+        <result property="tcode" column="tcode"></result>
+        <result property="pid" column="pid"></result>
+        <result property="tstate" column="tstate"></result>
+        <association property="tbldata" javaType="Tbldata">
+            <id property="dataid" column="dataid"></id>
+            <result property="dataname" column="dataname"></result>
+        </association>
+    </resultMap>
+
+    <select id="countRows" resultType="java.lang.Integer">
+        select count(*) from tbltypeprint
+    </select>
+
+    <insert id="addTrash" parameterType="Map">
+        insert into tbltypeprint (tname,tstate) values (#{tname},#{tstate})
+    </insert>
+<!--修改信息-->
+    <update id="updateTrash" parameterType="Map">
+        update tbltypeprint
+        <set>
+            <if test="tname != null and tname !=''">tname=#{tname},</if>
+        </set>
+        where tid=#{tid}
+    </update>
+
+    <!--修改状态-->
+    <update id="updateState" parameterType="Map">
+        update tbltypeprint set tstate=#{tstate} where tid=#{tid}
+    </update>
+
+    <update id="setstate">
+        update tbltypeprint
+        <set>
+            <if test="map.tstate != null and map.tstate != ''">tstate=#{map.tstate}</if>
+        </set>
+        where tstate &lt;&gt; 4 and tid in
+        <foreach item="item" index="index" collection="map.trashidArry" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </update>
+
+
+    <select id="selTrashListCount" resultType="int" parameterType="Map">
+        select count(*) from tbltypeprint
+        <where>
+            1 = 1
+            <if test="tname!=null and tname!=''">
+                and tname like concat('%',#{tname},'%')
+            </if>
+            <if test="dstateStr!=null and dstateStr!=''">
+                and tstate like concat('%',#{dstateStr},'%')
+            </if>
+        </where>
+    </select>
+
+    <!--查看哪个存在-->
+    <select id="findExist" resultType="Tbltypeprint">
+        select * from tbltypeprint
+        <where>
+            <if test="tname !=null and tname!=''">
+                and tname = #{tname}
+            </if>
+        </where>
+    </select>
+
+<!--    新增的接口，根据id获得名称-->
+    <select id="getNameId" resultType="Tbltypeprint">
+        select * from tbltypeprint where tstate = 2 and tid in(1,2,3,4,5)
+    </select>
+
+
+</mapper>

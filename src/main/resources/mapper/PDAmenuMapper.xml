@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cykj.hospitalsystem.mapper.PDAmenuMapper">
+    <select id="authorityMenuPDA" resultMap="PDAState" parameterType="Map">
+        select * from tblPDAmenu p left join tbldata d on p.mstate=d.dataid
+        <where>
+            <if test="exceptMstate!=null and exceptMstate!=''">
+                mstate!=#{exceptMstate}
+            </if>
+            <if test="PDAStateValueStr!=null and PDAStateValueStr!='' and PDAStateValueStr!=18">
+                and mstate=#{PDAStateValueStr}
+            </if>
+            <if test="label!=null and label!=''">
+                and label=#{label}
+            </if>
+        </where>
+    </select>
+    <resultMap id="PDAState" type="TblPDAmenu">
+        <id property="menuid" column="menuid"/>
+        <result property="mpid" column="mpid"/>
+        <result property="label" column="label"/>
+        <result property="url" column="url"/>
+        <result property="mstate" column="mstate"/>
+        <association property="tbldata" javaType="Tbldata">
+            <result property="dataname" column="dataname"></result>
+        </association>
+    </resultMap>
+<!--    通过角色id获得 所拥有的菜单权限-->
+    <select id="getPDAId" resultType="TblPdAmenu" parameterType="Map">
+        select m.menuid,m.mpid
+        from tblPDAmenu m LEFT JOIN tblPDArole pr on m.menuid= pr.menuid
+        LEFT JOIN tblrole tr on tr.roleid=pr.roleid
+        and tr.rolestate=2 and m.mstate=2 where tr.roleid=#{roleid}
+    </select>
+
+    <select id="getPDAidByArrayId" resultType="TblPdAmenu" parameterType="Map">
+        select * from tblPDAmenu
+        <where>
+--             <if test="map.treeArray!= null and map.treeArray.size()>0">
+                menuid in
+                <foreach item="item" collection="map.treeArray" open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+--             </if>
+        </where>
+    </select>
+
+    <select id="getAllPdaMenu" resultType="TblPdAmenu" parameterType="Map">
+        select * from tblPDAmenu where mstate = 2
+    </select>
+
+    <!--批量修改状态-->
+    <update id="setPDAmenuState" >
+        update tblPDAmenu
+        <set>
+            <if test="map.mstate != null and map.mstate != ''">mstate=#{map.mstate}</if>
+        </set>
+        where menuid in
+        <foreach item="item" index="index" collection="map.menuidArry" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </update>
+
+    <!--修改菜单数据-->
+    <update id="setPDAmenuData" parameterType="Map">
+        update tblPDAmenu
+        <set>
+            <if test="pid != null and pid !=''">mpid=#{pid},</if>
+            <if test="url != null and url !=''">url=#{url},</if>
+            <if test="label != null and label !=''">label=#{label}</if>
+        </set>
+        where menuid=#{menuid}
+    </update>
+
+    <!--新增菜单-->
+    <insert id="addPDAmenu" parameterType="Map">
+        insert into tblPDAmenu
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="mpid!=null and mpid!=''">mpid,</if>
+            <if test="url!=null and url!=''">url,</if>
+            <if test="label!=null and label!=''">label,</if>
+            <if test="mstate!=null and mstate!=''">mstate</if>
+        </trim>
+        <trim prefix="values(" suffix=")" suffixOverrides=",">
+            <if test="mpid!=null and mpid!=''">#{mpid},</if>
+            <if test="url!=null and url!=''">#{url},</if>
+            <if test="label!=null and label!=''">#{label},</if>
+            <if test="mstate!=null and mstate!=''">#{mstate}</if>
+        </trim>
+    </insert>
+</mapper>

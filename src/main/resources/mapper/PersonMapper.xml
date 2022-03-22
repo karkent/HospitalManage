@@ -1,0 +1,246 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cykj.hospitalsystem.mapper.PersonMapper">
+        <select id="select" resultMap="selectmap" parameterType="java.util.HashMap">
+                select * from tbl_view
+                <where>
+                        1 = 1
+                        <if test="sphone!=null and sphone!=''">
+                                and sphone like concat('%',#{sphone},'%')
+                        </if>
+                        <if test="sname!=null and sname!=''">
+                                and sname like concat('%',#{sname},'%')
+                        </if>
+                        <if test="dname!=null and dname!=''">
+                                or dname like concat('%',#{dname},'%')
+                        </if>
+                        <if test="rolename!=null and rolename!=''">
+                                or rolename like concat('%',#{rolename},'%')
+                        </if>
+                        <if test="spinyin!=null and spinyin!=''">
+                                and spinyin like concat('%',#{spinyin},'%')
+                        </if>
+                        <if test="sjobnum!=null and sjobnum!=''">
+                                and sjobnum like concat('%',#{sjobnum},'%')
+                        </if>
+                        <if test="state!=null and state!=''">
+                            and sstate = #{state}
+                        </if>
+                </where>
+                order by  staffid  limit #{page},#{limit}
+        </select>
+        <resultMap id="selectmap" type="TblView">
+                <id property="staffid" column="staffid"/>
+                <result property="sname" column="sname"/>
+                <result property="sjobnum" column="sjobnum"/>
+                <result property="dname" column="dname"/>
+                <result property="sidentitycard" column="sidentitycard"/>
+                <result property="sstate" column="sstate"/>
+                <result property="sphone" column="sphone"/>
+                <!--                <result property="hid" column="hid"></result>-->
+                <result property="scornet" column="scornet"/>
+                <!--                <result property="sort" column="sort"></result>-->
+                <result property="wechatnum" column="wechatnum"/>
+                <result property="did" column="did"/>
+                <!--                <result property="svaliddate" column="svaliddate"></result>-->
+                <!--                <result property="signurl" column="signurl"></result>-->
+                <result property="spinyin" column="spinyin"/>
+                <collection property="rolenamelist" ofType="Tblrole">
+                        <result property="roleid" column="roleid"/>
+                        <result property="rolename" column="rolename"/>
+                </collection>
+        </resultMap>
+
+        <select id="alltotal" resultType="java.lang.Integer" parameterType="Map">
+                select count(*) from tblstaff
+                <where>
+                        <if test="state!=null and state!=''">
+                                 sstate = #{state}
+                        </if>
+                </where>
+        </select>
+
+        <select id="total" resultType="java.lang.Integer" parameterType="Map">
+                select count(*) from tbl_view
+                <where>
+                        1  =   1
+                        <if test="sphone!=null and sphone!=''">
+                                and sphone like  concat('%',#{sphone},'%')
+                        </if>
+                        <if test="sname!=null and sname!=''">
+                                and sname like  concat('%',#{sname},'%')
+                        </if>
+                        <if test="dname!=null and dname!=''">
+                                or  dname like  concat('%',#{dname},'%')
+                        </if>
+                        <if test="rolename!=null and rolename!=''">
+                                or  rolename like  concat('%',#{rolename},'%')
+                        </if>
+                        <if test="spinyin!=null and spinyin!=''">
+                                and spinyin like  concat('%',#{spinyin},'%')
+                        </if>
+                        <if test="sjobnum!=null and sjobnum!=''">
+                                and sjobnum like  concat('%',#{sjobnum},'%')
+                        </if>
+                        <if test="state!=null and state!=''">
+                                and sstate = #{state}
+                        </if>
+                </where>
+        </select>
+
+
+
+
+
+
+        <update id="personBan" parameterType="java.util.List">
+                update tblstaff
+                <set>
+                        <if test="list!=null and list.size>0">
+                                sstate = 3
+                        </if>
+                </set>
+                where staffid in
+                <foreach item="item" index="index" collection="list" open="(" separator="," close=")">
+                        #{item}
+                </foreach>
+        </update>
+
+        <update id="personEnable">
+                update tblstaff
+                <set>
+                        <if test="list!=null and list.size>0">
+                                sstate = 2
+                        </if>
+                </set>
+                where staffid in
+                <foreach item="item" index="index" collection="list" open="(" separator="," close=")">
+                        #{item}
+                </foreach>
+        </update>
+
+        <insert  id="addPerson" parameterType="Map">
+                <selectKey keyProperty="staffid" order="AFTER" resultType="java.lang.Integer">
+                        SELECT LAST_INSERT_ID()
+                </selectKey>
+                insert into tblstaff (sname,sstate,sjobnum,scornet,sidentitycard,sphone,wechatnum,did,spinyin,hid,spwd)
+                values
+                (#{sname},2,#{sjobnum},#{scornet},#{sidentitycard},#{sphone},#{wechatnum},#{depvalue},#{pinyin},#{hid},#{spwd})
+        </insert>
+
+        <insert id="addRole" parameterType="Map">
+                insert into tblstaffRole (staffid,roleid) values
+                <foreach collection="roleList" item="item" index="index" separator=",">
+                        (#{staffid},#{item})
+                </foreach>
+        </insert>
+
+        <insert id="adddepartment" parameterType="Map">
+                insert into tbldepartmentStaff (staffid,did) values
+                <foreach collection="departmentList" item="item" index="index" separator=",">
+                        (#{staffid},#{item})
+                </foreach>
+        </insert>
+
+
+        <update id="UpdataPerson" parameterType="Map">
+                update tblstaff set sname = #{sname},sjobnum =#{sjobnum},scornet = #{scornet},sidentitycard =#{sidentitycard},
+                                    sphone = #{sphone},wechatnum =#{wechatnum}, did = #{depvalue}
+                where staffid = #{staffid}
+        </update>
+        <delete id="deleteRole" parameterType="Map">
+                delete from tblstaffRole where staffid = #{staffid}
+        </delete>
+        <delete id="deleteDep" parameterType="Map">
+                delete  from tbldepartmentStaff where staffid = #{staffid}
+        </delete>
+
+        <select id="allDepartment" resultType="com.cykj.hospitalsystem.bean.Tbldepartrment">
+                select * from tbldepartrment  where dstate = 2
+        </select>
+
+        <select id="getPersonDepartment" resultType="com.cykj.hospitalsystem.bean.TbldepartmentStaff">
+                select did from tbldepartmentStaff where staffid = #{id}
+        </select>
+
+        <update id="restpwd" parameterType="Map">
+                update tblstaff set spwd = #{password} where staffid = #{pid}
+        </update>
+
+        <select id="getAllRole" resultType="com.cykj.hospitalsystem.bean.Tblrole">
+                select roleid,rolename from tblrole  where rolestate = 2
+                and roleid != 1
+                order by
+                        case when roleid=2 then 0 else roleid end
+        </select>
+
+        <select id="getQrcodeInfo" parameterType="java.util.List" resultType="com.cykj.hospitalsystem.bean.Tblstaff">
+                select * from tbl_view
+        </select>
+
+        <select id="getAdmin" resultMap="adminmap">
+                select a.*,b.rolename,c.hname FROM tbladmininfo a
+                    LEFT JOIN tblrole b on a.roleid = b.roleid
+                    LEFT JOIN tblhospitalinfo c on a.hid = c.hid
+                <where>
+                        a.roleid != 1
+                        and c.hid != 1
+                        <if test="astate!=null and astate!=''">
+                                and astate = #{astate}
+                        </if>
+                        <if test="info!=null and info!=''">
+                                and aname like concat('%',#{info},'%')
+                        </if>
+                </where>
+                        limit #{page},#{limit}
+        </select>
+        <resultMap id="adminmap" type="Tbladmininfo">
+                <id property="adminid" column="adminid"/>
+                <result property="aname" column="aname"/>
+                <result property="ajobnum" column="ajobnum"/>
+                <result property="astate" column="astate"/>
+                <result property="aphone" column="aphone"/>
+<!--                <result property="roleid" column="roleid"/>-->
+<!--                <result property="hid" column="hid"/>-->
+                <association property="tblrole" javaType="Tblrole">
+                        <result property="roleid" column="roleid"/>
+                        <result property="rolename" column="rolename"/>
+                </association>
+                <association property="tblhospitalinfo" javaType="Tblhospitalinfo">
+                        <result property="hid" column="hid"/>
+                        <result property="hname" column="hname"/>
+                </association>
+        </resultMap>
+
+        <insert id="addAdmin" parameterType="Map">
+                insert into tbladmininfo  (aname,ajobnum,astate,acardnum,aphone,acornet,roleid,hid,apwd)
+                values (#{aname},#{ajobnum},2,#{acardnum},#{aphone},#{acornet},#{role},#{hid},#{apwd})
+        </insert>
+
+        <select id="getHospital" resultType="com.cykj.hospitalsystem.bean.Tblhospitalinfo">
+                select hid,hname from tblhospitalinfo where hstate = 2 and hid != 1
+        </select>
+
+        <update id="updataAdmin" parameterType="Map">
+                update tbladmininfo set
+                aname = #{aname}, ajobnum = #{ajobnum}, acardnum = #{acardnum},
+                aphone = #{aphone} , acornet = #{acornet} ,roleid = #{role} ,hid = #{hid}
+                where
+                        adminid = #{adminid}
+        </update>
+
+        <select id="adminTotal" parameterType="Map" resultType="java.lang.Integer">
+                select  count(*) from tbladmininfo
+                <where>
+                        <if test="astate!=null and astate!=''">
+                                and astate = #{astate}
+                        </if>
+                </where>
+        </select>
+
+        <update id="restAdmin" parameterType="Map">
+            update tbladmininfo set apwd =#{password} where adminid =#{adminid}
+        </update>
+</mapper>

@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cykj.hospitalsystem.mapper.TbladmininfoMapper">
+    <insert id="addadmin" parameterType="Map">
+        insert into tbladmininfo(aname,ajobnum,acardnum,astate,apwd,aphone,acornet,roleid,hid)
+        values(#{aname},#{ajobnum},#{acardnum},2,#{apwd},#{aphone},#{acornet},#{roleid},#{hid})
+    </insert>
+    <select id="getLoginCheck" parameterType="Map" resultType="Tbladmininfo">
+        select * from tbladmininfo
+        <where>
+            1 = 1
+            <if test="ajobnum!=null and ajobnum!=''">
+                and ajobnum=#{ajobnum}
+            </if>
+            <if test="aphone!=null and aphone!=''">
+                and aphone=#{aphone}
+            </if>
+            <if test="password!=null and password!=''">
+                and apwd=#{password}
+            </if>
+            <if test="adminid!=null and adminid!=''">
+                and adminid=#{adminid}
+            </if>
+        </where>
+    </select>
+
+    <select id="byUserNameGetAdmin" parameterType="Map" resultType="Tbladmininfo">
+        select * from tbladmininfo
+        <where>
+            1 = 1
+            <if test="ajobnum!=null and ajobnum!=''">
+                and ajobnum=#{ajobnum}
+            </if>
+            <if test="aphone!=null and aphone!=''">
+                or aphone=#{aphone}
+            </if>
+            <if test="adminid!=null and adminid!=''">
+                and adminid=#{adminid}
+            </if>
+        </where>
+    </select>
+
+    <select id="check" resultType="Tbladmininfo">
+        select * from tbladmininfo
+        <where>
+            <if test="ajobnum!=null and ajobnum!=''">
+                and ajobnum = #{ajobnum}
+            </if>
+            <if test="aphone!=null and aphone!=''">
+                and aphone = #{aphone}
+            </if>
+        </where>
+    </select>
+
+    <select id="loginStaff" resultType="Tblstaff" parameterType="Map">
+        select * from tblstaff
+        <where>
+            1 = 1
+            <if test="ajobnum!=null and ajobnum!=''">
+                and sjobnum=#{ajobnum}
+            </if>
+            <if test="aphone!=null and aphone!=''">
+                and sphone=#{aphone}
+            </if>
+            <if test="password!=null and password!=''">
+                and spwd=#{password}
+            </if>
+            <if test="staffid!=null and staffid!=''">
+                and staffid=#{staffid}
+            </if>
+        </where>
+    </select>
+
+    <select id="loginCheckHospital" parameterType="Map" resultType="Tblhospitalinfo">
+        select * from tblhospitalinfo where hid=#{hid} and  #{nowDate} &lt;= hwarrantdate and hstate=2
+    </select>
+
+    <update id="updatePWd" parameterType="Map">
+        update tbladmininfo set apwd = #{newPwd} where adminid=#{adminid}
+    </update>
+
+    <update id="updatePWdstaff" parameterType="Map">
+        update tblstaff set spwd = #{newPwd} where staffid=#{staffid}
+    </update>
+
+    <select id="getHname" parameterType="Map" resultType="String">
+        select hname from tblhospitalinfo where hid=#{hid}
+    </select>
+</mapper>

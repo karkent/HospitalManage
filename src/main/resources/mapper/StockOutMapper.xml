@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cykj.hospitalsystem.mapper.StockOutMapper">
+
+    <!-- 查询医废入库信息 -->
+    <select id="queryStockInInfo" resultType="StockOut" parameterType="Map">
+        select * from stock_out where state = (select dataid from tbldata where dataname = '已出库' and pid = 5)
+            <if test="hname != null and hname != '' and hname gt 0">
+                and hid = #{hname}
+            </if>
+            <if test="beginTime != null and beginTime != '' and endTime != null and endTime != ''">
+                and (outdate between #{beginTime} and #{endTime})
+            </if>
+            <if test="type != null and type != '' and type gt 0">
+                and typeid = #{type}
+            </if>
+            <if test="outbatchnum != null and outbatchnum != ''">
+                and outbatchnum like CONCAT(CONCAT('%',#{outbatchnum}),'%')
+            </if>
+        limit #{nowPage} , #{pageSize}
+    </select>
+
+    <!-- 查询医废入库信息总条数 -->
+    <select id="queryStockInInfoCount" resultType="java.lang.Integer" parameterType="Map">
+        select count(*) from stock_out where state = (select dataid from tbldata where dataname = '已出库' and pid = 5)
+            <if test="hname != null and hname != '' and hname gt 0">
+                and hid = #{hname}
+            </if>
+            <if test="beginTime != null and beginTime != '' and endTime != null and endTime != ''">
+                and (outdate between #{beginTime} and #{endTime})
+            </if>
+            <if test="type != null and type != '' and type gt 0">
+                and typeid = #{type}
+            </if>
+            <if test="outbatchnum != null and outbatchnum != ''">
+                and outbatchnum like CONCAT(CONCAT('%', #{outbatchnum}), '%')
+            </if>
+    </select>
+
+    <!-- 查询所有医院名称 -->
+    <select id="getHospitalName" resultType="Tblhospitalinfo">
+        select hid,hname from tblhospitalinfo where hstate = 2 and hid!=1
+    </select>
+
+    <!-- 查询所有医院医废类型 -->
+    <select id="getMedicalWasteType" resultType="Tbltypeprint">
+        select tid,tname from tbltypeprint
+    </select>
+
+    <!-- 查询医废入库信息(无分页) -->
+    <select id="queryStockInInfoAll" resultType="StockOut" parameterType="Map">
+        select *
+        from outlistInfoview
+        where
+        1=1
+        <if test="hname != null and hname != '' and hname gt 0">
+            and hid = #{hname}
+        </if>
+        <if test="beginTime != null and beginTime != '' and endTime != null and endTime != ''">
+            and (outdate between #{beginTime} and #{endTime})
+        </if>
+        <if test="type != null and type != '' and type gt 0">
+            and typeid = #{type}
+        </if>
+        <if test="outbatchnum != null and outbatchnum != ''">
+            and outbatchnum like CONCAT(CONCAT('%', #{outbatchnum}), '%')
+        </if>
+    </select>
+</mapper>

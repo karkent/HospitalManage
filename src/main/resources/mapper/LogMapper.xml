@@ -1,0 +1,31 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cykj.hospitalsystem.mapper.LogMapper">
+    <insert id="add" parameterType="Map">
+        insert into tbllog
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="module!=null and module!=''">
+                module,
+            </if>
+            <if test="action!=null and action!=''">
+                action,
+            </if>
+            <if test="remark!=null and remark!=''">
+                remark,
+            </if>
+        </trim>
+        <trim prefix="values(" suffix=")" suffixOverrides=",">
+            <if test="module!=null and module!=''">
+                #{module},
+            </if>
+            <if test="action!=null and action!=''">
+                #{action},
+            </if>
+            <if test="remark!=null and remark!=''">
+                #{remark},
+            </if>
+        </trim>
+    </insert>
+</mapper>

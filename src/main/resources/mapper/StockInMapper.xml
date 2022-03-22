@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cykj.hospitalsystem.mapper.StockInMapper">
+
+    <!-- 查询医废入库信息 -->
+    <select id="queryStockInInfo" resultType="StockIn" parameterType="Map">
+        select * from stock_in
+        <where>
+            1 = 1
+            <if test="hname!= null and hname != '' and hname gt 0">
+                and hid = #{hname}
+            </if>
+            <if test="beginTime!= null and beginTime != '' and endTime != null and endTime != ''">
+                and (enterdate between #{beginTime} and #{endTime})
+            </if>
+            <if test="state!= null and state != '' and state gt 0">
+                and state = #{state}
+            </if>
+        </where>
+        limit #{nowPage} , #{pageSize}
+    </select>
+
+    <!-- 查询医废入库信息总条数 -->
+    <select id="queryStockInInfoCount" resultType="java.lang.Integer" parameterType="Map">
+        select count(*) from stock_in
+        <where>
+            <if test="hname != null and hname != '' and hname gt 0">
+                and hid = #{hname}
+            </if>
+            <if test="beginTime != null and beginTime != '' and endTime != null and endTime != ''">
+                and (enterdate between #{beginTime} and #{endTime})
+            </if>
+            <if test="state != null and state != '' and state gt 0">
+                and state = #{state}
+            </if>
+        </where>
+    </select>
+
+    <!-- 查询所有医院名称 -->
+    <select id="getHospitalName" resultType="Tblhospitalinfo">
+        select hid,hname from tblhospitalinfo where hstate = 2 and hid!=1
+    </select>
+
+    <!-- 批量出库 -->
+    <update id="batchOutLibrary">
+        update tblmedicaltype
+        set state = (select dataid from tbldata where dataname = '已出库' and pid = 5)
+        where infoid in
+        <foreach collection="map.stickInArray" item="item" index="index" open="(" close=")" separator=",">
+            #{item.infoid}
+        </foreach>
+    </update>
+
+    <insert id="AddTWO">
+        insert into tbltrashout(outweight,outman,outdate,infoid) values
+        <foreach collection="map.stickInArray" item="item" separator=",">
+            (#{item.enterweight},#{map.outman},#{map.outdate},#{item.infoid})
+        </foreach>
+    </insert>
+
+    <!-- 批量全部出库 -->
+    <update id="batchOutLibraryAll">
+    update tblmedicaltype set state = 8 where state = 7
+</update>
+
+    <!--    查询 收集入库视图表 通过状态-->
+    <select id="findTblByState" resultType="StockIn">
+    select * from stock_in where state=7
+</select>
+    <!-- 查询医废入库信息(无分页) -->
+    <select id="queryStockInInfoAll" resultType="StockIn">
+        select *,@i:= @i+ 1 AS row from stock_in,( SELECT @i:= 0 ) r
+        <where>
+            <if test="hname != null and hname != '' and hname gt 0">
+                and hid = #{hname}
+            </if>
+            <if test="beginTime != null and beginTime != '' and endTime != null and endTime != ''">
+                and (enterdate between #{beginTime} and #{endTime})
+            </if>
+            <if test="state != null and state != '' and state gt 0">
+                and state = #{state}
+            </if>
+        </where>
+    </select>
+
+    <!--    插入入库表-->
+    <insert id="addMedicalIn" parameterType="Map">
+        insert into tbltrashin
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="infoid!=null and infoid!=''">infoid,</if>
+            <if test="joinid!=null and joinid!=''">enterid,</if>
+            <if test="weight!=null and weight!=''">enterweight,</if>
+            <if test="collectdate!=null and collectdate!=''">enterdate</if>
+        </trim>
+        <trim prefix="values(" suffix=")" suffixOverrides=",">
+            <if test="infoid!=null and infoid!=''">#{infoid},</if>
+            <if test="joinid!=null and joinid!=''">#{joinid},</if>
+            <if test="weight!=null and weight!=''">#{weight},</if>
+            <if test="collectdate!=null and collectdate!=''">#{collectdate}</if>
+        </trim>
+    </insert>
+</mapper>

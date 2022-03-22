@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cykj.hospitalsystem.mapper.TbldepartrmentMapper">
+
+    <!--    查询科室信息-->
+    <!--    <select id="selectList" resultType="Tbldepartrment" parameterType="Map">-->
+    <!--        select * from tbldepartrment limit #{nowPage},#{pageSize}-->
+    <!--    </select>-->
+
+    <!--    查询总条数-->
+    <select id="countRows" resultType="String" parameterType="Map">
+        select count(*) from tbldepartrment
+        <where>
+            1 = 1
+            <if test="dname!=null and dname!=''">
+                and dname like concat('%',#{dname},'%')
+            </if>
+            <if test="dcode!=null and dcode!=''">
+                and dcode like concat('%',#{dcode},'%')
+            </if>
+            <if test="dspell!=null and dspell!=''">
+                or dspell like concat('%',#{dspell},'%')
+            </if>
+            <if test="dstateStr!=null and dstateStr!=''">
+                and dstate like concat('%',#{dstateStr},'%')
+            </if>
+        </where>
+    </select>
+
+    <!--    科室状态查询-->
+    <select id="selectState" resultMap="departrmentAndData" parameterType="Map">
+        select * from tbldepartrment td
+        left join tbldata d on td.dstate=d.dataid
+        left join tblkname tn on td.kid=tn.kid
+        <where>
+            1 = 1
+            <if test="dname!=null and dname!=''">
+                and td.dname like concat('%',#{dname},'%')
+            </if>
+            <if test="dcode!=null and dcode!=''">
+                and td.dcode like concat('%',#{dcode},'%')
+            </if>
+            <if test="dspell!=null and dspell!=''">
+                or td.dspell like concat('%',#{dspell},'%')
+            </if>
+                and td.dstate like concat('%',#{dstateStr},'%')
+        </where>
+        order by td.did desc limit #{nowPage},#{pageSize}
+    </select>
+    <resultMap id="departrmentAndData" type="Tbldepartrment">
+        <id property="did" column="did"></id>
+        <result property="kid" column="kid"></result>
+        <result property="dname" column="dname"></result>
+        <result property="dcode" column="dcode"></result>
+        <result property="dspell" column="dspell"></result>
+        <result property="depidemic" column="depidemic"></result>
+        <result property="dprintnum" column="dprintnum"></result>
+        <result property="dplacenta" column="dplacenta"></result>
+        <result property="pwarning" column="pwarning"></result>
+        <result property="collecmode" column="collecmode"></result>
+        <result property="ordernum" column="ordernum"></result>
+        <result property="dfloornum" column="dfloornum"></result>
+        <result property="dfloor" column="dfloor"></result>
+        <result property="droomNum" column="droomNum"></result>
+        <result property="dproduce" column="dproduce"></result>
+        <result property="insterdate" column="insterdate"></result>
+        <result property="dstate" column="dstate"></result>
+        <association property="tbldata" javaType="Tbldata">
+            <id property="dataid" column="dataid"></id>
+            <result property="dataname" column="dataname"></result>
+        </association>
+        <association property="tblkname" javaType="Tblkname">
+            <id property="kid" column="kid"></id>
+            <result property="kname" column="kname"></result>
+            <result property="knum" column="knum"></result>
+        </association>
+    </resultMap>
+
+
+    <!--    查询国际-->
+    <select id="selTblkname" resultType="Tblkname">
+        select * from tblkname
+    </select>
+
+    <select id="MaxDid" resultType="String">
+        select max(did) from tbldepartrment
+    </select>
+
+    <!--增加科室-->
+    <insert id="addDate" parameterType="Map">
+        insert into tbldepartrment
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="kid!=null and kid!=''">kid,</if>
+            <if test="dincode!=null and dincode!=''">dincode,</if>
+            <if test="dname!=null and dname!=''">dname,</if>
+            <if test="dspell!=null and dspell!=''">dspell,</if>
+            <if test="dcode!=null and dcode!=''">dcode,</if>
+            <if test="depidemic!=null and depidemic!=''">depidemic,</if>
+            <if test="dprintnum!=null and dprintnum!=''">dprintnum,</if>
+            <if test="dplacenta!=null and dplacenta!=''">dplacenta,</if>
+            <if test="pwarning!=null and pwarning!=''">pwarning,</if>
+            <if test="collecmode!=null and collecmode!=''">collecmode,</if>
+            <if test="ordernum!=null and ordernum!=''">ordernum,</if>
+            <if test="dfloornum!=null and dfloornum!=''">dfloornum,</if>
+            <if test="dfloor!=null and dfloor!=''">dfloor,</if>
+            <if test="droomNum!=null and droomNum!=''">droomNum,</if>
+            <if test="dproduce!=null and dproduce!=''">dproduce,</if>
+            <if test="dstate!=null and dstate!=''">dstate</if>
+        </trim>
+        <trim prefix="values(" suffix=")" suffixOverrides=",">
+            <if test="kid!=null and kid!=''">#{kid},</if>
+            <if test="dincode!=null and dincode!=''">#{dincode},</if>
+            <if test="dname!=null and dname!=''">#{dname},</if>
+            <if test="dspell!=null and dspell!=''">#{dspell},</if>
+            <if test="dcode!=null and dcode!=''">#{dcode},</if>
+            <if test="depidemic!=null and depidemic!=''">#{depidemic},</if>
+            <if test="dprintnum!=null and dprintnum!=''">#{dprintnum},</if>
+            <if test="dplacenta!=null and dplacenta!=''"> #{dplacenta},</if>
+            <if test="pwarning!=null and pwarning!=''">#{pwarning},</if>
+            <if test="collecmode!=null and collecmode!=''">#{collecmode},</if>
+            <if test="ordernum!=null and ordernum!=''">#{ordernum},</if>
+            <if test="dfloornum!=null and dfloornum!=''">#{dfloornum},</if>
+            <if test="dfloor!=null and dfloor!=''">#{dfloor},</if>
+            <if test="droomNum!=null and droomNum!=''">#{droomNum},</if>
+            <if test="dproduce!=null and dproduce!=''">#{dproduce},</if>
+            <if test="dstate!=null and dstate!=''">#{dstate}</if>
+        </trim>
+    </insert>
+
+    <!--修改科室信息-->
+    <update id="updDate" parameterType="Map">
+        update tbldepartrment
+        <set>
+            <if test="kid != null and kid!='' ">kid=#{kid},</if>
+            <if test="dname != null and dname!='' ">dname=#{dname},</if>
+            <if test="dcode != null and dcode!='' ">dcode=#{dcode},</if>
+            <if test="depidemic != null and depidemic!=''">depidemic=#{depidemic},</if>
+            <if test="dprintnum != null and dprintnum!='' ">dprintnum=#{dprintnum},</if>
+            <if test="dplacenta != null and dplacenta!='' ">dplacenta=#{dplacenta},</if>
+            <if test="pwarning != null and pwarning!='' ">pwarning=#{pwarning},</if>
+            <if test="collecmode != null and collecmode!='' ">collecmode=#{collecmode},</if>
+            <if test="ordernum != null and ordernum!='' ">ordernum=#{ordernum},</if>
+            <if test="dfloornum != null and dfloornum!='' ">dfloornum=#{dfloornum},</if>
+            <if test="dfloor != null and dfloor!='' ">dfloor=#{dfloor},</if>
+            <if test="dproduce != null and dproduce!='' ">dproduce=#{dproduce},</if>
+            <if test="droomNum != null and droomNum!='' ">droomNum=#{droomNum}</if>
+        </set>
+        where did=#{did}
+    </update>
+
+    <!--修改科室状态-->
+    <update id="updStateDate">
+        update tbldepartrment
+        <set>
+            <if test="map.dstate != null and map.dstate!='' ">dstate=#{map.dstate}</if>
+        </set>
+        where dstate &lt;&gt; 4 and did in
+        <foreach item="item" index="index" collection="map.departrmentIdArray" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </update>
+
+    <!--批量增加科室-->
+    <insert id="addBatch" parameterType="java.util.List">
+        insert into tbldepartrment(dstate,dname,dcode,kid,dspell) values
+        <foreach collection="list" item="dp" separator=",">
+            (#{dp.dstate},#{dp.dname},#{dp.dcode},#{dp.kname},#{dp.dspell})
+        </foreach>
+    </insert>
+
+    <!--判断科室名称和科室编码不重复-->
+    <select id="Seldistinct" resultType="Tbldepartrment">
+        select * from tbldepartrment
+        <where>
+            1 = 1
+            <if test="dname != null and dname!='' ">
+            and dname=#{dname}
+            </if>
+            <if test="dcode != null and dcode!='' ">
+            and dcode=#{dcode}
+            </if>
+        </where>
+    </select>
+
+
+    <select id="departmentstaff" resultMap="stafflist">
+        SELECT d.dname,s.sname,s.staffid FROM tbldepartrment  d LEFT JOIN tblstaff s on d.did = s.did
+    </select>
+    <resultMap id="stafflist" type="Tbldepartrment">
+        <result property="dname" column="dname"></result>
+        <result property="label" column="dname"></result>
+        <collection property="children" ofType="Tblstaff">
+            <id property="staffid" column="staffid"></id>
+            <result property="sname" column="sname"></result>
+            <result property="label" column="sname"></result>
+        </collection>
+    </resultMap>
+
+</mapper>

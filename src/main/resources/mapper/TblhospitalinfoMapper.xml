@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cykj.hospitalsystem.mapper.TblhospitalinfoMapper">
+
+    <select id="countRows" resultType="int">
+        select count(*) from tblhospitalinfo t left join tbldata d on t.hstate=d.dataid
+        <where>
+            1 = 1
+            <if test="hname!=null and hname!=''">
+                and t.hname like concat('%',#{hname},'%')
+            </if>
+            <if test="huscc!=null and huscc!=''">
+                and t.huscc like concat('%',#{huscc},'%')
+            </if>
+            <if test="hstateStr!=null and hstateStr!=''">
+                and hstate like concat('%',#{hstateStr},'%')
+            </if>
+            <if test="hlegal!=null and hlegal!=''">
+                or t.hlegal like concat('%',#{hlegal},'%')
+            </if>
+            <if test="hmobilephone!=null and hmobilephone!=''">
+                and t.hmobilephone like concat('%',#{hmobilephone},'%')
+            </if>
+        </where>
+    </select>
+
+    <select id="check" resultType="Tblhospitalinfo">
+        select * from tblhospitalinfo
+        <where>
+            <if test="hname!=null and hname!=''">
+                and hname = #{hname}
+            </if>
+            <if test="huscc!=null and huscc!=''">
+                and huscc = #{huscc}
+            </if>
+        </where>
+    </select>
+
+    <select id="selectid" resultType="Tblhospitalinfo">
+        select * from tblhospitalinfo where hname = #{hname} and huscc = #{huscc}
+    </select>
+
+    <update id="updatehospital" parameterType="Map">
+        update tblhospitalinfo
+        <set>
+            <if test="hname!=null and hname!=''">hname=#{hname},</if>
+            <if test="huscc!=null and huscc!=''">huscc=#{huscc},</if>
+            <if test="hbusiness!=null">hbusiness=#{hbusiness},</if>
+            <if test="haddress!=null">haddress=#{haddress},</if>
+            <if test="hwarrantdate!=null and hwarrantdate!=''">hwarrantdate=#{hwarrantdate},</if>
+            <if test="hlevel!=null and hlevel!=''">hlevel=#{hlevel},</if>
+            <if test="hequalorder!=null and hequalorder!=''">hequalorder=#{hequalorder},</if>
+            <if test="hlegal!=null and hlegal!=''">hlegal=#{hlegal},</if>
+            <if test="hlegalcard!=null and hlegalcard!=''">hlegalcard=#{hlegalcard},</if>
+            <if test="hofficephone!=null">hofficephone=#{hofficephone},</if>
+            <if test="hmobilephone!=null and hmobilephone!=''">hmobilephone=#{hmobilephone},</if>
+            <if test="hcantoncode!=null">hcantoncode=#{hcantoncode}</if>
+        </set>
+        where hid = #{hid}
+    </update>
+
+    <insert id="addhospital" parameterType="Map">
+        insert into tblhospitalinfo(hname,huscc,hbusiness,haddress,hstate,hwarrantdate,
+        hlevel,hequalorder,hlegal,hlegalcard,hofficephone,hmobilephone,hcantoncode,hinsterdate)
+        values(#{hname},#{huscc},#{hbusiness},#{haddress},3,#{hwarrantdate},#{hlevel},
+        #{hequalorder},#{hlegal},#{hlegalcard},#{hofficephone},#{hmobilephone},#{hcantoncode},#{hinsterdate})
+    </insert>
+
+    <update id="upstate">
+        update tblhospitalinfo
+        <set>
+            <if test="map.hstate!=null and map.hstate!=''">hstate=#{map.hstate}</if>
+        </set>
+        where hid in
+        <foreach item="item" index="index" collection="map.hidArray" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </update>
+
+    <select id="find" resultMap="hospitalAndData" parameterType="Map">
+        select * from tblhospitalinfo t left join tbldata d on t.hstate=d.dataid
+        <where>
+            1 = 1
+            and t.hid != 1
+            <if test="hname!=null and hname!=''">
+                and t.hname like concat('%',#{hname},'%')
+            </if>
+            <if test="huscc!=null and huscc!=''">
+                and t.huscc like concat('%',#{huscc},'%')
+            </if>
+            <if test="hstateStr!=null and hstateStr!=''">
+                and hstate like concat('%',#{hstateStr},'%')
+            </if>
+            <if test="hlegal!=null and hlegal!=''">
+                or t.hlegal like concat('%',#{hlegal},'%')
+            </if>
+            <if test="hmobilephone!=null and hmobilephone!=''">
+                and t.hmobilephone like concat('%',#{hmobilephone},'%')
+            </if>
+        </where>
+        order by t.hid desc limit #{nowPage},#{pageSize}
+    </select>
+    <resultMap id="hospitalAndData" type="Tblhospitalinfo">
+        <id property="hid" column="hid"/>
+        <result property="hname" column="hname"/>
+        <result property="huscc" column="huscc"/>
+        <result property="hbusiness" column="hbusiness"/>
+        <result property="haddress" column="haddress"/>
+        <result property="hstate" column="hstate"/>
+        <result property="hwarrantdate" column="hwarrantdate"/>
+        <result property="hlevel" column="hlevel"/>
+        <result property="hequalorder" column="hequalorder"/>
+        <result property="hlegal" column="hlegal"/>
+        <result property="hlegalcard" column="hlegalcard"/>
+        <result property="hofficephone" column="hofficephone"/>
+        <result property="hmobilephone" column="hmobilephone"/>
+        <result property="hcantoncode" column="hcantoncode"/>
+        <result property="hinsterdate" column="hinsterdate"/>
+        <association property="tbldata" javaType="Tbldata">
+            <result property="dataname" column="dataname"/>
+        </association>
+    </resultMap>
+</mapper>

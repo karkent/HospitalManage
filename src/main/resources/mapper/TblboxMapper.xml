@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cykj.hospitalsystem.mapper.TblboxMapper">
+
+    <!--初始化数据-->
+    <select id="showTable" resultMap="boxAndData" parameterType="Map">
+        select * from tblbox b
+        left join tbldata d on b.bstate=d.dataid
+        left join tblhospitalinfo h on b.hid = h.hid
+        <where>
+            1 = 1
+            <if test="boxcode!=null and boxcode!=''">
+                and b.boxcode like concat('%',#{boxcode},'%')
+            </if>
+            <if test="insterdate!=null and insterdate!='' and startdate != null">
+                and b.insterdate between #{startdate} and #{enddate}
+            </if>
+            <if test="boxStateValueStr!=null and boxStateValueStr!=''">
+                and b.bstate = #{boxStateValueStr}
+            </if>
+        </where>
+        order by b.boxid desc limit #{nowPage},#{pageSize}
+    </select>
+    <resultMap id="boxAndData" type="tblbox">
+        <id property="boxid" column="boxid"></id>
+        <result property="bstate" column="bstate"></result>
+        <result property="boxcode" column="boxcode"></result>
+        <result property="fullName" column="fullName"></result>
+        <result property="hid" column="hid"></result>
+        <result property="insterdate" column="insterdate"></result>
+        <result property="updatadate" column="updatadate"></result>
+        <result property="usedate" column="usedate"></result>
+        <association property="tbldata" javaType="Tbldata">
+            <id property="dataid" column="dataid"></id>
+            <result property="dataname" column="dataname"></result>
+        </association>
+        <association property="tblhospitalinfo" javaType="Tblhospitalinfo">
+            <id property="hid" column="hid"></id>
+            <result property="hname" column="hname"></result>
+        </association>
+    </resultMap>
+
+
+    <!--    状态集合-->
+    <select id="selTbldata" resultType="Tbldata">
+    select * from tbldata where pid=23
+    </select>
+
+    <!--新增箱条码-->
+    <insert id="addbox" parameterType="Map">
+        insert into tblbox(bstate,boxcode,fullName,hid) values
+        <foreach collection="list" item="box" separator=",">
+            (#{box.bstate},#{box.boxcode},#{box.fullName},#{box.hid})
+        </foreach>
+    </insert>
+
+    <select id="MaxboxCode" resultType="String">
+        select MAX(boxcode) from tblbox where insterdate between #{startTime} and #{endTime}
+    </select>
+
+    <update id="setstate">
+        update tblbox
+        <set>
+            <if test="map.bstate != null and map.bstate != ''">bstate=#{map.bstate}</if>
+        </set>
+        where bstate &lt;&gt; 44 and boxid in
+        <foreach item="item" index="index" collection="map.boxidArry" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </update>
+    <select id="countRows" resultType="int" parameterType="Map">
+        select count(*) from tblbox b left join tbldata d on b.bstate=d.dataid
+        <where>
+            1 = 1
+            <if test="boxcode!=null and boxcode!=''">
+                and b.boxcode like concat('%',#{boxcode},'%')
+            </if>
+            <if test="insterdate!=null and insterdate!='' and startdate != null">
+                and b.insterdate between #{startdate} and #{enddate}
+            </if>
+            <if test="boxStateValueStr!=null and boxStateValueStr!=''">
+                and b.bstate = #{boxStateValueStr}
+            </if>
+        </where>
+        order by b.boxid desc
+    </select>
+
+    <!--    手工登记的业务 根据boxcode返回boxid-->
+    <select id="getIdbyBoxcode" resultType="String">
+        select boxid from tblbox where boxcode = #{boxcode}
+    </select>
+</mapper>

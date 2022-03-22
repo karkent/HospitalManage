@@ -1,0 +1,80 @@
+<?xml version='1.0' encoding='UTF-8'?>
+
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cykj.hospitalsystem.mapper.TblwarningMapper">
+
+    <select id="warningconfig" resultType="Tblwarning">
+        select  * from  tblwarning
+    </select>
+    <update id="savaWarning" parameterType="Map">
+        update tblwarning
+        <set>
+            <if test="notice!=null and notice!=''">notice=#{notice},</if>
+            <if test="carweight!=null and carweight!=''">carweight=#{carweight},</if>
+            <if test="entererror!=null and entererror!=''">entererror=#{entererror},</if>
+            <if test="removeboxkg!=null and removeboxkg!=''">removeboxkg=#{removeboxkg},</if>
+            <if test="boxkg!=null and boxkg!=''">boxkg=#{boxkg},</if>
+            <if test="peelnum!=null and peelnum!=''">peelnum=#{peelnum},</if>
+            <if test="bagerror!=null and bagerror!=''">bagerror=#{bagerror},</if>
+            <if test="enterovertime!=null and enterovertime!=''">enterovertime=#{enterovertime},</if>
+            <if test="joinovertime!=null and joinovertime!=''">joinovertime=#{joinovertime},</if>
+            <if test="warningtype!=null and warningtype!=''">warningtype=#{warningtype}</if>
+        </set>
+        where warningid = 1
+    </update>
+
+<!--    插入员工id到 预警员工关联表中-->
+    <insert id="addWarningstaff">
+        insert into tblwarningstaff(staffid,warningid) values
+        <foreach collection="map.staffArray" item="staff" separator=",">
+            (#{staff.staffid},
+            1)
+        </foreach>
+    </insert>
+
+<!--    查找员工id 已经在关联表的集合-->
+    <select id="warningGetInId" resultType="Tblstaff">
+    	select staffid from tblstaff where staffid in
+        (select staffid from tblwarningstaff where warningid = 1)
+    </select>
+
+    <delete id="delAllByWarningid">
+        delete from tblwarningstaff where warningid = 1
+    </delete>
+
+
+    <select id="warningStaff" resultMap="mapStaff">
+        select ts.staffid,ts.sname from tblstaff ts left JOIN tblwarningstaff tws on tws.staffid = ts.staffid
+		where tws.staffid = ts.staffid and ts.sstate = 2
+	</select>
+    <resultMap id="mapStaff" type="Tblstaff">
+        <id property="staffid" column="staffid"></id>
+        <result property="sname" column="sname"></result>
+        <result property="label" column="sname"></result>
+    </resultMap>
+
+<!--    查出 重量超出系统规定值的 收集列表   入库重量预警-->
+    <select id="StockInWeightCheck" parameterType="Map" resultType="Tblmedicaltype">
+        select * from tblmedicaltype tmt LEFT JOIN tbltrashin tt on tmt.infoid = tt.infoid
+        where 1=1
+        and (
+        (tmt.weight-#{delKg}) &lt; (tt.enterweight*#{frontNum})
+        or (tmt.weight-#{delKg}) &gt; (tt.enterweight*#{rearNum})
+         )
+        and (tmt.spare1 &lt;&gt; 1 or tmt.spare1 is null)
+    </select>
+
+
+    <select id="StockOutWeightCheck" parameterType="Map" resultType="Tblmedicaltype">
+        select * from tblmedicaltype tmt LEFT JOIN tbltrashout tt on tmt.infoid = tt.infoid
+        where 1=1
+        and (
+        (tmt.weight-#{delKg}) &lt; (tt.outweight*#{frontNum})
+        or (tmt.weight-#{delKg}) &gt; (tt.outweight*#{rearNum})
+         )
+        and (tmt.spare2 &lt;&gt; 1 or tmt.spare2 is null)
+    </select>
+
+</mapper>

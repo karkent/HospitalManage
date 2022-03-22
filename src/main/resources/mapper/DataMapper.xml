@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cykj.hospitalsystem.mapper.DataMapper">
+    <select id="selDataList" resultType="ViewD" parameterType="Map">
+        select * from view_d
+        <where>
+            1 = 1
+            <if test="dremarks!=null and dremarks!=''">
+                and dremarks like concat('%',#{dremarks},'%')
+            </if>
+            <if test="dataname!=null and dataname!=''">
+                or dataname like concat('%',#{dataname},'%')
+            </if>
+            <if test="pname!=null and pname!=''">
+                or pname like concat('%',#{pname},'%')
+            </if>
+            <if test="StateValueStr!=null and StateValueStr!=''">
+                and dstate like concat('%',#{StateValueStr},'%')
+            </if>
+        </where>
+        order by dataid desc limit #{nowPage},#{pageSize}
+    </select>
+    <select id="countRows" resultType="java.lang.Integer" parameterType="map">
+        select count(*) from view_d
+        <where>
+            1 = 1
+            <if test="dremarks!=null and dremarks!=''">
+                and dremarks like concat('%',#{dremarks},'%')
+            </if>
+            <if test="dataname!=null and dataname!=''">
+                or dataname like concat('%',#{dataname},'%')
+            </if>
+            <if test="pname!=null and pname!=''">
+                or pname like concat('%',#{pname},'%')
+            </if>
+            <if test="StateValueStr!=null and StateValueStr!=''">
+                and dstate like concat('%',#{StateValueStr},'%')
+            </if>
+        </where>
+    </select>
+    <select id="selpname" resultType="Tbldata" parameterType="Map">
+        select * from tbldata where pid=0
+    </select>
+    <update id="setstate">
+        update tbldata
+        <set>
+            <if test="map.dstate != null and map.dstate != ''">dstate=#{map.dstate}</if>
+        </set>
+        where dstate &lt;&gt; 4 and dataid in
+        <foreach item="item" index="index" collection="map.dataidArry" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </update>
+    <insert id="addData" parameterType="Map">
+     insert into tbldata (pid,dataname,dremarks,dstate) values (#{dataOptionValue},#{dataname},#{dremarks},#{dstate})
+     </insert>
+    <update id="updateData" parameterType="Map">
+        update tbldata
+        <set>
+            <if test="pid != null and pid !=''">pid=#{pid},</if>
+            <if test="dataname != null and dataname !=''">dataname=#{dataname},</if>
+            <if test="dremarks != null and dremarks !=''">dremarks=#{dremarks}</if>
+        </set>
+        where dataid=#{dataid}
+    </update>
+
+    <select id="findAllByPid" parameterType="Map" resultMap="DataMap">
+        select * from tbldata where pid=#{dataid}
+        order by case
+        when dataid=18 then 0 else dataid end
+    </select>
+    <resultMap id="DataMap" type="Tbldata">
+        <id property="dataid" column="dataid"></id>
+        <result property="value" column="dataid"></result>
+        <result property="label" column="dataname"></result>
+    </resultMap>
+
+    <select id="findAll" resultType="Tbldata" parameterType="Map">
+        select * from tbldata
+        <where>
+            1 = 1
+            <if test="dremarks!=null and dremarks!=''">
+                and dremarks like concat('%',#{dremarks},'%')
+            </if>
+            <if test="dataname!=null and dataname!=''">
+                or dataname like concat('%',#{dataname},'%')
+            </if>
+            <if test="StateValueStr!=null and StateValueStr!=''">
+                and dstate like concat('%',#{StateValueStr},'%')
+            </if>
+        </where>
+    </select>
+</mapper>

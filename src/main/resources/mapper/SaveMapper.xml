@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cykj.hospitalsystem.mapper.SaveMapper">
+<!--查找暂存点名称-->
+<!--    <select id="selSaveList" resultType="Tblsave" parameterType="Map">-->
+<!--        select * from tblsave-->
+<!--        <where>-->
+<!--            1 = 1-->
+<!--            <if test="savename !=null and savename!=''">-->
+<!--                and savename like concat('%',#{savename},'%')-->
+<!--            </if>-->
+<!--            <if test="savecode!=null and savecode!=''">-->
+<!--                and savecode like concat('%',#{savecode},'%')-->
+<!--            </if>-->
+<!--            and savestate like concat('%',#{saveStateValueStr},'%')-->
+<!--        </where>-->
+<!--        order by saveid desc limit #{nowPage},#{pageSize}-->
+<!--    </select>-->
+
+    <select id="countRows" resultType="java.lang.Integer" parameterType="map">
+        select count(*) from tblsave
+        <where>
+            <if test="savename !=null and savename!=''">
+                and savename like concat('%',#{savename},'%')
+            </if>
+            <if test="savecode!=null and savecode!=''">
+                and savecode like concat('%',#{savecode},'%')
+            </if>
+            and savestate like concat('%',#{saveStateValueStr},'%')
+        </where>
+    </select>
+<!--新增暂存点-->
+    <insert id="addSave" parameterType="Map">
+        insert into tblsave
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="savename != null and savename != ''">savename,</if>
+            <if test="savecode != null and savecode != ''">savecode,</if>
+            <if test="savestate != null and savestate != ''">savestate,</if>
+            <if test="fullName != null and fullName != ''">fullName,</if>
+            <if test="hid != null and hid != ''">hid</if>
+        </trim>
+        <trim prefix="values(" suffix=")" suffixOverrides=",">
+            <if test="savename != null and savename != ''">#{savename},</if>
+            <if test="savecode != null and savecode != ''">#{savecode},</if>
+            <if test="savestate != null and savestate != ''">#{savestate},</if>
+            <if test="fullName != null and fullName != ''">#{fullName},</if>
+            <if test="hid != null and hid != ''">#{hid}</if>
+        </trim>
+    </insert>
+<!--修改暂存点-->
+    <update id="updateSave" parameterType="Map">
+        update tblsave
+        <set>
+            <if test="savename != null and savename !=''">savename=#{savename},</if>
+            <if test="savecode != null and savecode !=''">savecode=#{savecode}</if>
+        </set>
+        where saveid=#{saveid}
+    </update>
+
+    <!--查状态-->
+    <select id="selsavestate" resultMap="saveAndData" parameterType="Map">
+        select * from tblsave t
+        left join tbldata d on t.savestate=d.dataid
+        left join tblhospitalinfo h on t.hid = h.hid
+        <where>
+            <if test="savename !=null and savename!=''">
+                and t.savename like concat('%',#{savename},'%')
+            </if>
+            <if test="savecode!=null and savecode!=''">
+                and t.savecode like concat('%',#{savecode},'%')
+            </if>
+            and t.savestate like concat('%',#{saveStateValueStr},'%')
+        </where>
+        order by t.saveid desc limit #{nowPage},#{pageSize}
+    </select>
+    <resultMap id="saveAndData" type="Tblsave">
+        <id property="saveid" column="saveid"></id>
+        <result property="savename" column="savename"></result>
+        <result property="savecode" column="savecode"></result>
+        <result property="insterdate" column="insterdate"></result>
+        <result property="fullName" column="fullName"></result>
+        <result property="hid" column="hid"></result>
+        <association property="tbldata" javaType="Tbldata">
+            <id property="dataid" column="dataid"></id>
+            <result property="dataname" column="dataname"></result>
+        </association>
+        <association property="tblhospitalinfo" javaType="Tblhospitalinfo">
+            <id property="hid" column="hid"></id>
+            <result property="hname" column="hname"></result>
+        </association>
+    </resultMap>
+
+    <!--批量操作-->
+    <update id="setstate">
+        update tblsave
+        <set>
+            <if test="map.savestate != null and map.savestate != ''">savestate=#{map.savestate}</if>
+        </set>
+        where saveid in
+        <foreach item="item" index="index" collection="map.saveidArry" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </update>
+<!--查看哪个存在-->
+    <select id="findExist" resultType="Tblsave">
+        select * from tblsave
+        <where>
+            1 = 1
+            <if test="savename !=null and savename!=''">
+                and savename = #{savename}
+            </if>
+            <if test="savecode!=null and savecode!=''">
+                and savecode = #{savecode}
+            </if>
+        </where>
+    </select>
+</mapper>

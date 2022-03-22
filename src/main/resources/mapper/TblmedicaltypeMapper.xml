@@ -1,0 +1,618 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cykj.hospitalsystem.mapper.TblmedicaltypeMapper">
+
+    <select id="countRows" resultType="int">
+        select count(*) from viewmedicaltype
+        <where>
+            1 = 1
+            <if test="bagcode!=null and bagcode!=''">
+                and bagcode like concat('%',#{bagcode},'%')
+            </if>
+            <if test="boxcode!=null and boxcode!=''">
+                or boxcode like concat('%',#{boxcode},'%')
+            </if>
+            <if test="state!=null and state!=''">
+                and state = #{state}
+            </if>
+            <if test="typeid!=null and typeid!=''">
+                and typeid = #{typeid}
+            </if>
+            <if test="joinid!=null and joinid!=''">
+                and joinid = #{joinid}
+            </if>
+            <if test="did!=null and did!=''">
+                and did = #{did}
+            </if>
+            <if test="depidemic!=null and depidemic!=''">
+                and depidemic = #{depidemic}
+            </if>
+            <if test="hid!=null and hid!=''">
+                and hid = #{hid}
+            </if>
+            <if test="startdate!=null and startdate!='' and enddate!=null and enddate!=''">
+                and collectdate Between #{startdate} And #{enddate}
+            </if>
+            <if test="infraction!=null and infraction!=''">
+                and infraction = #{infraction}
+            </if>
+        </where>
+    </select>
+
+    <!--    科室名称集合-->
+    <select id="selTbldpartment" resultType="Tbldepartrment">
+        select * from tbldepartrment where dstate = 2
+    </select>
+
+    <!--    医废分类集合-->
+    <select id="selTbltypeprin" resultType="Tbltypeprint">
+        select * from tbltypeprint
+    </select>
+
+    <!--    医院集合-->
+    <select id="selTblhospitalinfo" resultType="Tblhospitalinfo">
+        select * from tblhospitalinfo where hstate = 2 and hid!=1
+    </select>
+
+    <!--    状态集合-->
+    <select id="selTbldata" resultType="Tbldata">
+    select * from tbldata where pid=5
+    </select>
+
+    <!--    交接人集合-->
+    <select id="selTblstaff" resultType="Tblstaff">
+    select * from tblstaff
+    </select>
+
+    <!--    暂存点集合-->
+    <select id="selTblsave" resultType="Tblsave">
+    select * from tblsave
+    </select>
+
+    <!--    周转箱状态 未使用 集合-->
+    <select id="selTblboxcode" resultType="Tblbox">
+        select * from tblbox where bstate= 24
+    </select>
+    <!--    周转箱状态 已使用(已入库) 集合-->
+    <select id="selTblboxcodes" resultType="Tblbox">
+        select * from tblbox where bstate= 26
+    </select>
+
+    <!--批量修改医废分类-->
+    <update id="upTrashType">
+        update tblmedicaltype
+        <set>
+            <if test="map.typeid != null and map.typeid!='' ">typeid=#{map.typeid}</if>
+        </set>
+        where infoid in
+        <foreach item="item" index="index" collection="map.trashIdArray" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </update>
+
+    <!--批量修改医废状态-->
+    <update id="upTrashState">
+        update tblmedicaltype
+        <set>
+            <if test="map.state != null and map.state!='' ">state=#{map.state}</if>
+        </set>
+        where infoid in
+        <foreach item="item" index="index" collection="map.trashStateArray" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </update>
+
+    <!--批量修改医废的暂存点   补关联入库箱 -->
+    <update id="upSaveid">
+        update tblmedicaltype
+        <set>
+            <if test="map.saveid != null and map.saveid!='' ">saveid=#{map.saveid}</if>
+        </set>
+        where infoid in
+        <foreach item="item" index="index" collection="map.SaveIdArray" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </update>
+
+    <!--修改 补关联入库袋 -->
+    <update id="upBoxcode" parameterType="Map">
+        update tblmedicaltype
+        <set>
+            <if test="boxcode != null and boxcode!='' ">boxcode=#{boxcode},</if>
+            <if test="bagcode != null and bagcode!='' ">bagcode=#{bagcode}</if>
+        </set>
+        where infoid =#{infoid}
+    </update>
+
+    <!--    为导表提供所有数据-->
+    <select id="findAll" resultType="Viewmedicaltype" parameterType="Map">
+        select *,@i:= @i+ 1 AS row from viewmedicaltype,( SELECT @i:= 0 ) r
+        <where>
+            1 = 1
+            <if test="bagcode!=null and bagcode!=''">
+                and bagcode like concat('%',#{bagcode},'%')
+            </if>
+            <if test="boxcode!=null and boxcode!=''">
+                or boxcode like concat('%',#{boxcode},'%')
+            </if>
+            <if test="state!=null and state!=''">
+                and state = #{state}
+            </if>
+            <if test="typeid!=null and typeid!=''">
+                and typeid = #{typeid}
+            </if>
+            <if test="collectid!=null and collectid!=''">
+                and collectid = #{collectid}
+            </if>
+            <if test="did!=null and did!=''">
+                and did = #{did}
+            </if>
+            <if test="depidemic!=null and depidemic!=''">
+                and depidemic = #{depidemic}
+            </if>
+            <if test="hid!=null and hid!=''">
+                and hid = #{hid}
+            </if>
+            <if test="startdate!=null and startdate!='' and enddate!=null and enddate!=''">
+                and collectdate Between #{startdate} And #{enddate}
+            </if>
+            <if test="infraction!=null and infraction!=''">
+                and infraction = #{infraction}
+            </if>
+        </where>
+    </select>
+
+    <!--手工增加 登记-->
+    <insert id="HandaddDate" parameterType="Map">
+        insert into tblmedicaltype
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="did!=null and did!=''">did,</if>
+            <if test="state!=null and state!=''">state,</if>
+            <if test="typeid!=null and typeid!=''">typeid,</if>
+            <if test="hid!=null and hid!=''">hid,</if>
+            <if test="saveid!=null and saveid!=''">saveid,</if>
+            <if test="weight!=null and weight!=''">weight,</if>
+            <if test="collectdate!=null and collectdate!=''">collectdate,</if>
+            <if test="collectid!=null and collectid!=''">collectid,</if>
+            <if test="joinid!=null and joinid!=''">joinid,</if>
+            <if test="depidemic!=null and depidemic!=''">depidemic,</if>
+            <if test="boxcode!=null and boxcode!=''">boxcode,</if>
+            infraction,
+            warningisno
+        </trim>
+        <trim prefix="values(" suffix=")" suffixOverrides=",">
+            <if test="did!=null and did!=''">#{did},</if>
+            <if test="state!=null and state!=''">#{state},</if>
+            <if test="typeid!=null and typeid!=''">#{typeid},</if>
+            <if test="hid!=null and hid!=''">#{hid},</if>
+            <if test="saveid!=null and saveid!=''">#{saveid},</if>
+            <if test="weight!=null and weight!=''">#{weight},</if>
+            <if test="collectdate!=null and collectdate!=''">#{collectdate},</if>
+            <if test="collectid!=null and collectid!=''">#{collectid},</if>
+            <if test="joinid!=null and joinid!=''">#{joinid},</if>
+            <if test="depidemic!=null and depidemic!=''">#{depidemic},</if>
+            <if test="boxcode!=null and boxcode!=''">#{boxcode},</if>
+            #{infraction},
+            #{warningisno}
+        </trim>
+    </insert>
+
+
+    <!--    初始化显示数据-->
+    <select id="find" resultType="Viewmedicaltype" parameterType="Map">
+        select * from viewmedicaltype
+        <where>
+            1 = 1
+            <if test="bagcode!=null and bagcode!=''">
+                and bagcode like concat('%',#{bagcode},'%')
+            </if>
+            <if test="boxcode!=null and boxcode!=''">
+                or boxcode like concat('%',#{boxcode},'%')
+            </if>
+            <if test="state!=null and state!=''">
+                and state = #{state}
+            </if>
+            <if test="typeid!=null and typeid!=''">
+                and typeid = #{typeid}
+            </if>
+            <if test="collectid!=null and collectid!=''">
+                and collectid = #{collectid}
+            </if>
+            <if test="did!=null and did!=''">
+                and did = #{did}
+            </if>
+            <if test="depidemic!=null and depidemic!=''">
+                and depidemic = #{depidemic}
+            </if>
+            <if test="hid!=null and hid!=''">
+                and hid = #{hid}
+            </if>
+            <if test="startdate!=null and startdate!='' and enddate!=null and enddate!=''">
+                and collectdate Between #{startdate} And #{enddate}
+            </if>
+            <if test="infraction!=null and infraction!=''">
+                and infraction = #{infraction}
+            </if>
+        </where>
+        order by infoid desc limit #{currPage},#{pageSize}
+    </select>
+
+    <!--    查询 科室中的的人员-->
+    <select id="DpartPonser" resultType="ViewDepstaff" parameterType="Map">
+       select staffid,sname from view_depstaff where did = #{did}
+    </select>
+
+    <!--    收集人 集合——后勤保障科-->
+    <select id="collectList" resultType="ViewDepstaff" parameterType="Map">
+        select dname,staffid,sname from view_depstaff where dname = '后勤保障科'
+    </select>
+
+
+<!--    入库超时预警的-->
+    <select id="outtimein" resultType="Tblmedicaltype">
+        SELECT * FROM tblmedicaltype WHERE state = 6 and collectdate &lt;= #{nowtime}
+         and (warningisno &lt;&gt; 1 or warningisno is null)
+    </select>
+
+    <update id="warningstatus">
+        UPDATE tblmedicaltype SET warningisno = 1 WHERE infoid = #{infoid}
+    </update>
+
+<!--    医疗废物分析  根据医疗废物的类型，返回 日期区间的 数量-->
+    <select id="getNumByType" resultType="int" parameterType="Map">
+        select count(*) from tblmedicaltype mt left join tbltypeprint tp on tp.tid = mt.typeid
+        <where>
+            1 = 1
+            <if test="typeid!=null and typeid!=''">
+                and mt.typeid=#{typeid}
+            </if>
+            <if test="startTime!=null and startTime!='' and endTime!=null and endTime!=''">
+                and mt.collectdate between #{startTime} and #{endTime}
+            </if>
+            and tp.tstate = 2
+        </where>
+    </select>
+    <!--    根据日期获取 收集 列表医废重量和-->
+    <select id="collectWeightSUM" parameterType="Map" resultType="String">
+        select SUM(weight) from tblmedicaltype
+        <where>
+            1 = 1
+            <if test="startTime!=null and startTime!='' and endTime!=null and endTime!=''">
+                and collectdate between #{startTime} and #{endTime}
+            </if>
+            <if test="typeid!=null and typeid!=''">
+                and typeid = #{typeid}
+            </if>
+        </where>
+    </select>
+    <!--    根据日期获取 出库 列表医废重量和-->
+    <select id="outWeightSUM" parameterType="Map" resultType="String">
+        select SUM(outweight) from tbltrashout
+        <where>
+            1 = 1
+            <if test="startTime!=null and startTime!='' and endTime!=null and endTime!=''">
+                and outdate between #{startTime} and #{endTime}
+            </if>
+        </where>
+    </select>
+
+
+    <!--    预警的-->
+    <select id="weightWarning" resultType="Tblmedicaltype">
+        SELECT * FROM tblmedicaltype WHERE state = 6 and collectdate &lt;= #{nowtime}
+         and (warningisno &lt;&gt; 1 or warningisno is null)
+    </select>
+
+    <!--搜索出来插入 入库表-->
+    <select id="findSumtable" parameterType="Map" resultType="String">
+        select infoid from tblmedicaltype
+        <where>
+            <if test="did!=null and did!=''">and did=#{did}</if>
+            <if test="state!=null and state!=''">and state=#{state}</if>
+            <if test="typeid!=null and typeid!=''">and typeid=#{typeid}</if>
+            <if test="hid!=null and hid!=''">and hid=#{hid}</if>
+            <if test="saveid!=null and saveid!=''">and saveid=#{saveid}</if>
+            <if test="weight!=null and weight!=''">and weight=#{weight}</if>
+            <if test="collectdate!=null and collectdate!=''">and collectdate=#{collectdate}</if>
+            <if test="collectid!=null and collectid!=''">and collectid=#{collectid}</if>
+            <if test="joinid!=null and joinid!=''">and joinid=#{joinid}</if>
+            <if test="depidemic!=null and depidemic!=''">and depidemic=#{depidemic}</if>
+            <if test="boxcode!=null and boxcode!=''">and boxcode=#{boxcode}</if>
+            <if test="infraction!=null and infraction!=''">and infraction=#{infraction}</if>
+            <if test="warningisno!=null and warningisno!=''">and warningisno=#{warningisno}</if>
+        </where>
+    </select>
+
+    <!--科室医疗废物记录表 -->
+    <select id="table" parameterType="Map" resultType="Viewmedicaltype">
+        select dname,did,weight,tname,typeid,sname2,sname,boxcode from viewmedicaltype
+        <where>
+            1 = 1
+            <if test="state!=null and state!=''">
+                and state = #{state}
+            </if>
+            <if test="typeid!=null and typeid!=''">
+                and typeid = #{typeid}
+            </if>
+            <if test="collectid!=null and collectid!=''">
+                and collectid = #{collectid}
+            </if>
+            <if test="did!=null and did!=''">
+                and did = #{did}
+            </if>
+            <if test="depidemic!=null and depidemic!=''">
+                and depidemic = #{depidemic}
+            </if>
+            <if test="hid!=null and hid!=''">
+                and hid = #{hid}
+            </if>
+            <if test="startdate!=null and startdate!='' and enddate!=null and enddate!=''">
+                and collectdate Between #{startdate} And #{enddate}
+            </if>
+            <if test="infraction!=null and infraction!=''">
+                and infraction = #{infraction}
+            </if>
+        </where>
+    </select>
+    <select id="findbox" parameterType="Map" resultType="TrashTable">
+        SELECT did,count(DISTINCT boxcode) as boxnum from viewmedicaltype
+        <where>
+            1 = 1
+            <if test="state!=null and state!=''">
+                and state = #{state}
+            </if>
+            <if test="typeid!=null and typeid!=''">
+                and typeid = #{typeid}
+            </if>
+            <if test="collectid!=null and collectid!=''">
+                and collectid = #{collectid}
+            </if>
+            <if test="did!=null and did!=''">
+                and did = #{did}
+            </if>
+            <if test="depidemic!=null and depidemic!=''">
+                and depidemic = #{depidemic}
+            </if>
+            <if test="hid!=null and hid!=''">
+                and hid = #{hid}
+            </if>
+            <if test="startdate!=null and startdate!='' and enddate!=null and enddate!=''">
+                and collectdate Between #{startdate} And #{enddate}
+            </if>
+            <if test="infraction!=null and infraction!=''">
+                and infraction = #{infraction}
+            </if>
+        </where>
+        GROUP BY did
+    </select>
+    <select id="findbox2" parameterType="Map" resultType="TrashTable">
+        SELECT typeid,count(DISTINCT boxcode) as boxnum from viewmedicaltype
+        <where>
+            1 = 1
+            <if test="state!=null and state!=''">
+                and state = #{state}
+            </if>
+            <if test="typeid!=null and typeid!=''">
+                and typeid = #{typeid}
+            </if>
+            <if test="collectid!=null and collectid!=''">
+                and collectid = #{collectid}
+            </if>
+            <if test="did!=null and did!=''">
+                and did = #{did}
+            </if>
+            <if test="depidemic!=null and depidemic!=''">
+                and depidemic = #{depidemic}
+            </if>
+            <if test="hid!=null and hid!=''">
+                and hid = #{hid}
+            </if>
+            <if test="startdate!=null and startdate!='' and enddate!=null and enddate!=''">
+                and collectdate Between #{startdate} And #{enddate}
+            </if>
+            <if test="infraction!=null and infraction!=''">
+                and infraction = #{infraction}
+            </if>
+        </where>
+        GROUP BY typeid
+    </select>
+    <select id="findbag" parameterType="Map" resultType="TrashTable">
+        SELECT typeid,count(DISTINCT bagcode) as bagnum from viewmedicaltype
+        <where>
+            1 = 1
+            <if test="state!=null and state!=''">
+                and state = #{state}
+            </if>
+            <if test="typeid!=null and typeid!=''">
+                and typeid = #{typeid}
+            </if>
+            <if test="collectid!=null and collectid!=''">
+                and collectid = #{collectid}
+            </if>
+            <if test="did!=null and did!=''">
+                and did = #{did}
+            </if>
+            <if test="depidemic!=null and depidemic!=''">
+                and depidemic = #{depidemic}
+            </if>
+            <if test="hid!=null and hid!=''">
+                and hid = #{hid}
+            </if>
+            <if test="startdate!=null and startdate!='' and enddate!=null and enddate!=''">
+                and collectdate Between #{startdate} And #{enddate}
+            </if>
+            <if test="infraction!=null and infraction!=''">
+                and infraction = #{infraction}
+            </if>
+        </where>
+        GROUP BY typeid
+    </select>
+    <select id="findplacenta" parameterType="Map" resultType="TrashTable">
+        SELECT typeid,count(DISTINCT placentanum) as placentanum from viewmedicaltype
+        <where>
+            1 = 1
+            <if test="state!=null and state!=''">
+                and state = #{state}
+            </if>
+            <if test="typeid!=null and typeid!=''">
+                and typeid = #{typeid}
+            </if>
+            <if test="collectid!=null and collectid!=''">
+                and collectid = #{collectid}
+            </if>
+            <if test="did!=null and did!=''">
+                and did = #{did}
+            </if>
+            <if test="depidemic!=null and depidemic!=''">
+                and depidemic = #{depidemic}
+            </if>
+            <if test="hid!=null and hid!=''">
+                and hid = #{hid}
+            </if>
+            <if test="startdate!=null and startdate!='' and enddate!=null and enddate!=''">
+                and collectdate Between #{startdate} And #{enddate}
+            </if>
+            <if test="infraction!=null and infraction!=''">
+                and infraction = #{infraction}
+            </if>
+        </where>
+        GROUP BY typeid
+    </select>
+
+    <select id="hazardousWasteTable" parameterType="Map" resultType="HazardousWasteTable">
+        select
+			(select count(DISTINCT tmt.boxcode) from  tblmedicaltype tmt left join tbltrashin tti on tmt.infoid = tti.infoid
+			 <where>
+                 tmt.state=7
+                 <if test="sunshang!=null and sunshang!=''">
+                     and tmt.typeid = 2
+                 </if>
+                 <if test="qita!=null and qita!=''">
+                     and tmt.typeid in (1,3,4,5)
+                 </if>
+                 <if test="did!=null and did!=''">
+                     and tmt.did=#{did}
+                 </if>
+                 <if test="hid!=null and hid!=''">
+                     and tmt.hid=#{hid}
+                 </if>
+                 <if test="startdate!=null and startdate!='' and enddate!=null and enddate!=''">
+                     and tti.enterdate between #{startdate} And #{enddate}
+                 </if>
+             </where>
+        )as boxs,
+        (select count(DISTINCT tmt.bagcode) from tblmedicaltype tmt left join tbltrashin tti on tmt.infoid = tti.infoid
+        <where>
+            tmt.state=7
+            <if test="sunshang!=null and sunshang!=''">
+                and tmt.typeid = 2
+            </if>
+            <if test="qita!=null and qita!=''">
+                and tmt.typeid in (1,3,4,5)
+            </if>
+            <if test="did!=null and did!=''">
+                and tmt.did=#{did}
+            </if>
+            <if test="hid!=null and hid!=''">
+                and tmt.hid=#{hid}
+            </if>
+            <if test="startdate!=null and startdate!='' and enddate!=null and enddate!=''">
+                and tti.enterdate between #{startdate} And #{enddate}
+            </if>
+        </where>
+        )as bags,
+			sum(tmt.weight) totalweight
+			from
+			 tblmedicaltype tmt left join tbltrashin tti on tmt.infoid = tti.infoid
+        <where>
+            tmt.state=7
+            <if test="sunshang!=null and sunshang!=''">
+                and tmt.typeid = 2
+            </if>
+            <if test="qita!=null and qita!=''">
+                and tmt.typeid in (1,3,4,5)
+            </if>
+            <if test="did!=null and did!=''">
+                and tmt.did=#{did}
+            </if>
+            <if test="hid!=null and hid!=''">
+                and tmt.hid=#{hid}
+            </if>
+            <if test="startdate!=null and startdate!='' and enddate!=null and enddate!=''">
+                and tti.enterdate between #{startdate} And #{enddate}
+            </if>
+        </where>
+    </select>
+
+<!--打印交接单   -->
+    <select id="findjiao" parameterType="Map" resultType="TrashJiaoTable">
+    SELECT dd,dname,sname,sname2,
+    sum( CASE demo.typeid WHEN 1 THEN demo.weight ELSE 0 END ) ganweight, count(if(demo.typeid=1,true,null)) ganbagNum,
+    sum( CASE demo.typeid WHEN 2 THEN demo.weight ELSE 0 END ) sunweight,count(if(demo.typeid=2,true,null)) sunbagNum,
+    sum( CASE demo.typeid WHEN 3 THEN demo.weight ELSE 0 END ) bingweight,count(if(demo.typeid=3,true,null)) bingagNum,
+    sum( CASE demo.typeid WHEN 4 THEN demo.weight ELSE 0 END ) huaweight,count(if(demo.typeid=4,true,null)) huabagNum,
+    sum( CASE demo.typeid WHEN 5 THEN demo.weight ELSE 0 END ) yaohweight,count(if(demo.typeid=5,true,null)) yaobagNum,
+    sum( CASE demo.typeid WHEN 6 THEN demo.weight ELSE 0 END ) shuweight ,count(if(demo.typeid=6,true,null)) shubagNum
+    FROM
+    ( SELECT typeid, weight, did,dname,substring( collectdate, 9, 2 ) dd,sname,sname2 FROM viewmedicaltype
+    <where>
+        1 = 1
+        <if test="did!=null and did!=''">
+            and did=#{did}
+        </if>
+        <if test="startdate!=null and startdate!='' and enddate!=null and enddate!=''">
+            and collectdate Between #{startdate} And #{enddate}
+        </if>
+    </where>
+    ) demo
+    GROUP BY demo.dd,demo.sname,demo.sname2
+    </select>
+
+
+    <select id="kstable" parameterType="Map" resultType="tbldemo">
+        select
+        demo.dd,
+        sum( demo.weight ) ww, dname,sname,collection,
+        sum( CASE demo.typeid WHEN 1 THEN demo.weight ELSE 0 END ) aa,
+        sum( CASE demo.typeid WHEN 2 THEN demo.weight ELSE 0 END ) bb,
+        sum( CASE demo.typeid WHEN 3 THEN demo.weight ELSE 0 END ) cc,
+        sum( CASE demo.typeid WHEN 4 THEN demo.weight ELSE 0 END ) ee,
+        sum( CASE demo.typeid WHEN 5 THEN demo.weight ELSE 0 END ) ff,
+        sum( CASE demo.typeid WHEN 6 THEN demo.weight ELSE 0 END ) gg
+        from (
+        SELECT a.typeid, a.weight, a.did, substring( a.collectdate, 9, 2 ) dd ,b.dname ,c.sname,d.sname as collection FROM tblmedicaltype a
+        LEFT JOIN tbldepartrment b on a.did = b.did
+        LEFT JOIN tblstaff c on  a.joinid = c.staffid
+        LEFT JOIN tblstaff d on  a.collectid = d.staffid
+        <where>
+            (a.collectdate <![CDATA[ <= ]]> #{enddate} and a.collectdate <![CDATA[ >= ]]> #{startdate})
+            <if test="did != null and did != ''">
+                and a.did = #{did}
+            </if>
+            <if test="typeid != null and typeid != ''">
+                and a.typeid = #{typeid}
+            </if>
+            <if test="searchStr != null and searchStr !=''">
+                and a.boxcode = #{searchStr}
+            </if>
+            <if test="hid != null and hid !=''">
+                and a.hid = #{hid}
+            </if>
+            <if test="state != null and state !=''">
+                and a.state = #{state}
+            </if>
+            <if test="collectid != null and collectid !=''">
+                and a.collectid = #{collectid}
+            </if>
+            <if test="infraction != null and infraction !=''">
+                and a.infraction = #{infraction}
+            </if>
+        </where>
+        ) demo
+        GROUP BY
+        demo.dd ,demo.dname,demo.sname,demo.collection
+    </select>
+
+</mapper>

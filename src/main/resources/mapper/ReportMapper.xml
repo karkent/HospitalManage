@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cykj.hospitalsystem.mapper.ReportMapper">
+    <!-- 获取日报表的 产生 转运 入库 出库的重量 -->
+    <select id="getDailyReportWeight" resultType="DailyReport" parameterType="Map">
+        select sum(a.weight) weight,sum(b.enterweight) enterweight,sum(c.outweight) outweight from tblmedicaltype a left join tbltrashin b on a.infoid = b.infoid left join tbltrashout c on a.infoid = c.infoid left join tblhospitalinfo d on a.hid = d.hid left join tbltypeprint e on a.typeid = e.tid
+        <where>
+            <if test="hospitalName != null and hospitalName != '' and hospitalName gt 0">
+                and a.hid = #{hospitalName}
+            </if>
+            <if test="beginTime != null and beginTime != '' and endTime != null and endTime != ''">
+                and a.collectdate between #{beginTime} and #{endTime}
+            </if>
+        </where>
+    </select>
+
+    <!-- 获取日报表的 产生和转运的箱数 -->
+    <select id="getDailyReportNum" parameterType="Map" resultType="Integer">
+        select count(distinct boxcode) from tblmedicaltype
+        <where>
+            <if test="hospitalName != null and hospitalName != '' and hospitalName gt 0">
+                and hid = #{hospitalName}
+            </if>
+            <if test="beginTime != null and beginTime != '' and endTime != null and endTime != ''">
+                and collectdate between #{beginTime} and #{endTime}
+            </if>
+        </where>
+    </select>
+
+    <!-- 获取日报表的入库箱数 -->
+    <select id="getDailyReportstockInNum" resultType="java.lang.Integer">
+        select count(distinct a.boxcode) from tblmedicaltype a left join tbltrashin b on a.infoid = b.infoid where a.state = 7 and a.boxcode !='' and a.boxcode is not null
+        <if test="hospitalName != null and hospitalName != '' and hospitalName gt 0">
+            and a.hid = #{hospitalName}
+        </if>
+        <if test="beginTime != null and beginTime != '' and endTime != null and endTime != ''">
+            and a.collectdate between #{beginTime} and #{endTime}
+        </if>
+    </select>
+    <!-- 获取日报表的出库箱数 -->
+    <select id="getDailyReportstockOutNum" resultType="java.lang.Integer">
+        select count(distinct a.boxcode) from tblmedicaltype a left join tbltrashout c on a.infoid = c.infoid where a.state = 8 and a.boxcode !='' and a.boxcode is not null
+        <if test="hospitalName != null and hospitalName != '' and hospitalName gt 0">
+            and a.hid = #{hospitalName}
+        </if>
+        <if test="beginTime != null and beginTime != '' and endTime != null and endTime != ''">
+            and a.collectdate between #{beginTime} and #{endTime}
+        </if>
+    </select>
+
+    <!-- 获取日报表的入库重量 -->
+    <select id="getDailyReportstockInWeight" parameterType="Map" resultType="String">
+        select sum(b.enterweight) from tblmedicaltype a left join tbltrashin b on a.infoid = b.infoid where a.state = 7
+        <if test="hospitalName != null and hospitalName != '' and hospitalName gt 0">
+            and a.hid = #{hospitalName}
+        </if>
+        <if test="beginTime != null and beginTime != '' and endTime != null and endTime != ''">
+            and a.collectdate between #{beginTime} and #{endTime}
+        </if>
+    </select>
+    <!-- 获取日报表的出库重量 -->
+    <select id="getDailyReportstockOutWeight" parameterType="Map" resultType="String">
+        select sum(b.outweight) from tblmedicaltype a left join tbltrashout b on a.infoid = b.infoid where a.state = 8
+        <if test="hospitalName != null and hospitalName != '' and hospitalName gt 0">
+            and a.hid = #{hospitalName}
+        </if>
+        <if test="beginTime != null and beginTime != '' and endTime != null and endTime != ''">
+            and a.collectdate between #{beginTime} and #{endTime}
+        </if>
+    </select>
+
+
+    <!-- 获取日报表的各种类型的重量箱数 -->
+    <select id="getDailyReportTypeInfo" parameterType="Map" resultMap="getDailyReportTypeInfoMap">
+        select d.hname,e.tname,sum(a.weight) weight,count(distinct a.boxcode) quantity from tblmedicaltype a left join tbltrashin b on a.infoid = b.infoid left join tbltrashout c on a.infoid = c.infoid left join tblhospitalinfo d on a.hid = d.hid left join tbltypeprint e on a.typeid = e.tid where a.boxcode !='' and a.boxcode is not null
+        <if test="hospitalName != null and hospitalName != '' and hospitalName gt 0">
+            and a.hid = #{hospitalName}
+        </if>
+        <if test="beginTime != null and beginTime != '' and endTime != null and endTime != ''">
+            and a.collectdate between #{beginTime} and #{endTime}
+        </if>
+        GROUP BY a.typeid,d.hname
+    </select>
+    <resultMap id="getDailyReportTypeInfoMap" type="DailyReport">
+        <result property="hname" column="hname"></result>
+        <collection property="list" ofType="DailyReport">
+            <result property="tname" column="tname"></result>
+            <result property="weight" column="weight"></result>
+            <result property="quantity" column="quantity"></result>
+        </collection>
+    </resultMap>
+
+    <!-- 获取日报表 报表的重量数据 -->
+    <select id="getEchartsInfo" parameterType="Map" resultMap="getDailyReportTypeInfoMap">
+        select d.hname,e.tname,sum(a.weight) weight,count(distinct a.boxcode) quantity from tblmedicaltype a left join tbltrashin b on a.infoid = b.infoid left join tbltrashout c on a.infoid = c.infoid left join tblhospitalinfo d on a.hid = d.hid left join tbltypeprint e on a.typeid = e.tid where a.boxcode !='' and a.boxcode is not null
+        <if test="hospitalName != null and hospitalName != ''">
+            and a.hid = #{hospitalName}
+        </if>
+        <if test="hospitalName gt 0">
+            and a.hid = #{hospitalName}
+        </if>
+        <if test="beginTime != null and beginTime != '' and endTime != null and endTime != ''">
+            and a.collectdate between #{beginTime} and #{endTime}
+        </if>
+        GROUP BY a.typeid,d.hname
+    </select>
+
+    <!-- 获取月报表 报表重量数据 -->
+    <select id="getEchartsMouthInfo" parameterType="Map" resultType="MouthData">
+        select a.cday,IFNULL(b.weight, 0) weight from (SELECT @cdate := DATE_ADD(@cdate, INTERVAL +1 DAY) cday
+        FROM( SELECT @cdate := DATE_ADD(#{beginTime}, INTERVAL -1 DAY) FROM tbldatemouth ) t0
+        WHERE date(@cdate) &lt; DATE_ADD(DATE_ADD(#{beginTime}, INTERVAL 1 MONTH) , INTERVAL -1 DAY)) a left join (select date_format(collectdate,'%Y-%m-%d') date,sum(weight) weight from tblmedicaltype where date_format(collectdate,'%Y-%m') = #{beginAndEndTime}
+        <if test="hospitalName != null and hospitalName != ''">
+            and hid = #{hospitalName}
+        </if>
+        <if test="hospitalName gt 0">
+            and hid = #{hospitalName}
+        </if>
+        GROUP BY date_format(collectdate,'%Y-%m-%d')) b on a.cday = b.date order by a.cday
+    </select>
+
+    <!-- 获取年报表的报表重量数据 -->
+    <select id="getEchartsYearInfo" parameterType="Map" resultType="MouthData">
+        SELECT T1.cday,  IFNULL(T2.NUM,0) weight
+        FROM (
+                 SELECT date_format( @cdate1 := DATE_ADD(@cdate1, INTERVAL +1 MONTH) ,'%Y-%m') cday
+                 FROM( SELECT @cdate1 := DATE_ADD(#{beginTime}, INTERVAL -1 MONTH) FROM tbldatemouth limit 12 ) t0
+             ) T1
+                 LEFT JOIN (
+            select date_format(collectdate,'%Y-%m') AS CDAY,sum( weight) AS NUM
+            from tblmedicaltype
+            where date_format(collectdate,'%Y') =#{beginAndEndTime}
+            <if test="hospitalName != null and hospitalName != ''">
+                and hid = #{hospitalName}
+            </if>
+            <if test="hospitalName gt 0">
+                and hid = #{hospitalName}
+            </if>
+            GROUP BY  date_format(collectdate,'%Y-%m')
+        ) T2  ON T1.CDAY=T2.CDAY order by cday;
+    </select>
+
+</mapper>
