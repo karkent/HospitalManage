@@ -4,6 +4,7 @@ import com.cykj.hospitalsystem.bean.Tbladmininfo;
 import com.cykj.hospitalsystem.bean.Tblhospitalinfo;
 import com.cykj.hospitalsystem.service.TbladmininfoService;
 import com.cykj.hospitalsystem.service.TblhospitalinfoService;
+import com.cykj.hospitalsystem.service.impl.TblhospitalinfoServiceImpl;
 import com.cykj.hospitalsystem.until.KTool;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -20,12 +21,14 @@ public class hospitalinfoController {
     @Autowired
     private TblhospitalinfoService tblhospitalinfoService;
     @Autowired
+    private TblhospitalinfoServiceImpl tblhospitalinfoImpl;
+    @Autowired
     private TbladmininfoService tbladmininfoService;
 
     @RequestMapping("/find")
     @ResponseBody //跳过视图
     public Map<String,Object> find(@RequestBody Map<String,Object> map){
-        return tblhospitalinfoService.find(map);
+        return tblhospitalinfoImpl.find(map);
     }
 
     @RequestMapping("/updatehospital")

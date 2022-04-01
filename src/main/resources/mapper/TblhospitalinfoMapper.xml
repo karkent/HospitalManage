@@ -102,6 +102,7 @@
         </where>
         order by t.hid desc limit #{nowPage},#{pageSize}
     </select>
+
     <resultMap id="hospitalAndData" type="Tblhospitalinfo">
         <id property="hid" column="hid"/>
         <result property="hname" column="hname"/>
@@ -122,4 +123,5 @@
             <result property="dataname" column="dataname"/>
         </association>
     </resultMap>
+
 </mapper>

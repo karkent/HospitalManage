@@ -96,6 +96,7 @@ public class TblhospitalinfoServiceImpl implements TblhospitalinfoService {
                 map.put("huscc",str);
             }
         }
+        System.out.println(tblhospitalinfoMapper.find(map).toString()+"@#@#@##@#@##@");
         map.put("tableData",tblhospitalinfoMapper.find(map));
         map.put("totalCum",tblhospitalinfoMapper.countRows(map));
         return KTool.codeToclient(map);

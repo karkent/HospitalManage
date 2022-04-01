@@ -101,6 +101,8 @@ public class RolepowerServiceImpl implements RolepowerService {
         // 修改角色表
         int i = roleMapper.updateRole(map);
         // 将选中的权限state设置为1
+        System.out.println(map.toString());
+        System.out.println(map.size()+"@"+map.get("roleid"));
         int j = rolepowerMapper.setAuthority(map);
         // 将未选中的权限state设置为0
         int k = rolepowerMapper.setAuthorityNot(map);

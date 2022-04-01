@@ -4,7 +4,6 @@ package com.cykj.hospitalsystem.service.impl;
 
 import com.cykj.hospitalsystem.bean.*;
 import com.cykj.hospitalsystem.mapper.*;
-import com.cykj.hospitalsystem.service.TblboxService;
 import com.cykj.hospitalsystem.service.TblmedicaltypeService;
 import com.cykj.hospitalsystem.until.KTool;
 //import com.fasterxml.jackson.databind.jsontype.TypeIdResolver;
@@ -132,7 +131,14 @@ public class TblmedicaltypeServiceImpl implements TblmedicaltypeService {
             map.put("bagcode", str);
             map.put("boxcode", str);
         }
-        map.put("tableData", tblmedicaltypeMapper.find(map));
+        List<Viewmedicaltype> map1 = tblmedicaltypeMapper.find(map);
+        for (Viewmedicaltype v :map1) {
+            if (v.getSaveid()==0 ){
+                v.setSavename(null);
+            }
+        }
+
+        map.put("tableData",map1);
         map.put("totalCum", tblmedicaltypeMapper.countRows(map));
         return KTool.codeToclient(map);
     }
@@ -186,7 +192,7 @@ public class TblmedicaltypeServiceImpl implements TblmedicaltypeService {
         }
         return map;
     }
-
+//改
     @Override
     public Map<String, Object> upSaveid(Map<String, Object> map) {
         int i = tblmedicaltypeMapper.upSaveid(map);
@@ -206,7 +212,7 @@ public class TblmedicaltypeServiceImpl implements TblmedicaltypeService {
         map.put("msg", "补关联入库(袋)成功");
         return KTool.codeToclient(map);
     }
-
+    //改
     @Override
     public Map<String, Object> HandaddDate(Map<String, Object> map) {
         map.put("infraction", 0);
