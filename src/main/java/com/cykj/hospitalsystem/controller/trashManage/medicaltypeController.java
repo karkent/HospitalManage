@@ -1,5 +1,6 @@
 package com.cykj.hospitalsystem.controller.trashManage;
 
+import com.alibaba.fastjson.JSONObject;
 import com.cykj.hospitalsystem.service.TblmedicaltypeService;
 import com.cykj.hospitalsystem.until.KTool;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -134,7 +135,7 @@ public class medicaltypeController {
     @RequestMapping("/FindcollectList")
     @ResponseBody
     public Map<String, Object> FindcollectList(@RequestBody Map<String, Object> map){
-        System.out.println("后勤保障部中的收集人员:");
+        System.out.println("后勤保障部中的收集人员:"+ JSONObject.toJSONString(map));
         return tblmedicaltypeService.collectList(map);
     }
 

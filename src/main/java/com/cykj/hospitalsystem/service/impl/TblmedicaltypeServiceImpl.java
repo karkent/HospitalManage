@@ -2,6 +2,8 @@ package com.cykj.hospitalsystem.service.impl;
 
 
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.cykj.hospitalsystem.bean.*;
 import com.cykj.hospitalsystem.mapper.*;
 import com.cykj.hospitalsystem.service.TblmedicaltypeService;
@@ -244,6 +246,7 @@ public class TblmedicaltypeServiceImpl implements TblmedicaltypeService {
     @Override
     public Map<String, Object> collectList(Map<String, Object> map) {
         List<ViewDepstaff> list = tblmedicaltypeMapper.collectList(map);
+        JSONObject.toJSONString(list+"123");
         map.put("list", list);
         return KTool.codeToclient(map);
     }
@@ -268,20 +271,27 @@ public class TblmedicaltypeServiceImpl implements TblmedicaltypeService {
         String nowdate = sdf.format(date);
 
         map.put("dayList", day(nowdate));//调用日分析
-        map.put("nowdate", nowdate);
-
+        System.out.println(JSONObject.toJSONString(day(nowdate))+"!!");
+        map.put("nowdate", nowdate);//现在的时间
+        System.out.println(JSONObject.toJSONString(nowdate));
         map.put("monthList", month(nowdate));// 调用月分析
-        map.put("MonthStart", nowdate.substring(0, 7) + "-01");
-
+        System.out.println(JSONObject.toJSONString(month(nowdate)));
+        map.put("MonthStart", nowdate.substring(0, 7) + "-01");//月初的时间
+        System.out.println(JSONObject.toJSONString(nowdate.substring(0, 7) + "-01"));
         map.put("inOut15", inOut15(nowdate)); // 近十五天
 
-        int dayforweek = Integer.valueOf(KTool.weekMap(nowdate).get("dayForWeek").toString()); // 获取星期几
+        int dayforweek = Integer.valueOf(KTool.weekMap(nowdate).get("dayForWeek").toString()); // 获取星期几\
+
         String Monday = KTool.getNextDay(nowdate, -(dayforweek - 1)); // 获取当前周的周一
+
         map.put("collectWeight", getCollectWeight(nowdate, dayforweek, null)); // 收集列表重量
+
         map.put("outWeight", getOutWeight(nowdate, dayforweek)); // 出库列表重量
+
         map.put("Monday", Monday); // 当前周的周一
 
         String timeArray[] = KTool.getDataToStrTime(nowdate);
+
         map.put("LineMap", getWeightByTypeShowLine(dayforweek, timeArray)); //收集的折线图
 
         return KTool.codeToclient(map);
@@ -299,7 +309,7 @@ public class TblmedicaltypeServiceImpl implements TblmedicaltypeService {
             String startdate = sdf.format(new Date(timel));
             String enddate = sdf.format(new Date(time2));
             map.put("startdate", startdate);
-            map.put("enddate", enddate);
+            map.put("enddate", enddate);    
         } else { // 在不选择时间时获取当天0点0到23点59
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
             Date date = new Date();
@@ -744,8 +754,6 @@ public class TblmedicaltypeServiceImpl implements TblmedicaltypeService {
 
         return sumWeight.split("-");
     }
-
-
 //    // 近十五天收集趋势
     public String[] inOut15(String nowdate){
         String day15before = KTool.getNextDay(nowdate,-15);
@@ -766,7 +774,6 @@ public class TblmedicaltypeServiceImpl implements TblmedicaltypeService {
     }
 
 
-
     // 月分析
     public List<Map<String,Object>> month(String nowdate){
         String MonthStart = nowdate.substring(0,7)+"-01";
@@ -780,7 +787,6 @@ public class TblmedicaltypeServiceImpl implements TblmedicaltypeService {
         String endTime = KTool.getDataToStr(nowdate,1);
         return day_month(startTime,endTime);
     }
-
 
 
     // 日 月 分析

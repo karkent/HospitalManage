@@ -23,11 +23,20 @@ public class Tblwaringnotes {
     private String hname;
     private String dname;
     private String sname;
+    private String aname;
 
     // 关联映射 增加的属性
     private Tbldepartrment departrment;
     private Tbldata tbldata;
     private Tblhospitalinfo hospital;
+
+    public String getAname() {
+        return aname;
+    }
+
+    public void setAname(String aname) {
+        this.aname = aname;
+    }
 
     public String getSname() {
         return sname;

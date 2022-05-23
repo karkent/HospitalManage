@@ -58,10 +58,9 @@
 <!--    查出 重量超出系统规定值的 收集列表   入库重量预警-->
     <select id="StockInWeightCheck" parameterType="Map" resultType="Tblmedicaltype">
         select * from tblmedicaltype tmt LEFT JOIN tbltrashin tt on tmt.infoid = tt.infoid
-        where 1=1
-        and (
-        (tmt.weight-#{delKg}) &lt; (tt.enterweight*#{frontNum})
-        or (tmt.weight-#{delKg}) &gt; (tt.enterweight*#{rearNum})
+        where (
+        (tt.enterweight) &lt; (tmt.weight*#{rearNum})
+        or (tt.enterweight) &gt; (tmt.weight*#{frontNum})
          )
         and (tmt.spare1 &lt;&gt; 1 or tmt.spare1 is null)
     </select>

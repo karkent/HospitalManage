@@ -42,7 +42,7 @@
         bagcode,hid,wcase,wtime,kid) VALUES
         <foreach collection="map.medicaltypeList" item="item" separator=",">
             (#{map.handlestate},#{map.warningtype},#{map.warninglink},
-            #{item.bagcode},#{item.hid},#{map.wcase},#{map.nowdate},#{item.did})
+            #{item.bagcode},#{item.hid},#{map.wcase},#{map.dateStr},#{item.did})
         </foreach>
     </insert>
 
@@ -97,11 +97,12 @@
 
     <!-- 预警列表查询 -->
     <select id="findParam" resultType="com.cykj.hospitalsystem.bean.Tblwaringnotes" parameterType="Map">
-        select wn.noteid,td.dataname,wn.wcase,wn.handlestate,wn.warninglink,wn.wtime,wn.handleman,wn.handleidea,wn.handletime,hi.hname,dm.dname,st.sname
+        select wn.noteid,td.dataname,wn.wcase,wn.handlestate,wn.warninglink,wn.wtime,wn.handleman,wn.handleidea,wn.handletime,hi.hname,dm.dname,st.aname
         from tblwaringnotes wn left join tblhospitalinfo hi on hi.hid=wn.hid
         left join tbldepartrment dm on dm.did = wn.kid
         left join tbldata td on td.dataid = wn.warningtype
-        left join tblstaff st on st.staffid = wn.handleman
+        left join tbladmininfo st on st.adminid = wn.handleman
+
         <where>
             <if test="handlestate != null and handlestate != ''">
                 wn.handlestate = #{handlestate}

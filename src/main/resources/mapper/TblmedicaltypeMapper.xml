@@ -246,7 +246,7 @@
 
     <!--    收集人 集合——后勤保障科-->
     <select id="collectList" resultType="ViewDepstaff" parameterType="Map">
-        select dname,staffid,sname from view_depstaff where dname = '后勤保障科'
+        select dname,staffid,sname from view_depstaff where dname like '%后勤保%'
     </select>
 
 

@@ -1,5 +1,6 @@
 package com.cykj.hospitalsystem.controller.dashboard;
 
+import com.alibaba.fastjson.JSONObject;
 import com.cykj.hospitalsystem.bean.StockIn;
 import com.cykj.hospitalsystem.bean.Tblwaringnotes;
 import com.cykj.hospitalsystem.mapper.TblwaringnotesMapper;
@@ -53,9 +54,9 @@ public class DashboardController {
     @RequestMapping("/listWarning")
     @ResponseBody // 预警列表：预警弹窗表格 下一页功能，直接调用map层，没什么业务逻辑。
     public Map<String,Object> listWaring(@RequestBody Map<String,Object> map){
+        System.out.println(JSONObject.toJSONString(map)+"@!");
         List<Tblwaringnotes> list = tblwaringnotesServiceImpl.findParam(map);
         int count = tblwaringnotesServiceImpl.findParamCount(map);
-
         Map map1 = new HashMap();
         map1.put("WarningList",list);
         map1.put("count",count);
