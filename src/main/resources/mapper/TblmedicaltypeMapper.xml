@@ -108,7 +108,7 @@
     <update id="upSaveid">
         update tblmedicaltype
         <set>
-            <if test="map.saveid != null and map.saveid!='' ">saveid=#{map.saveid}</if>
+            <if test="map.saveid != null and map.saveid!='' ">saveid=#{map.saveid},state = '7'</if>
         </set>
         where infoid in
         <foreach item="item" index="index" collection="map.SaveIdArray" open="(" separator="," close=")">

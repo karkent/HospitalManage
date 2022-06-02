@@ -6,13 +6,13 @@
 <mapper namespace="com.cykj.hospitalsystem.mapper.TblwaringnotesMapper">
 
     <insert id="addnote" parameterType="java.util.List">
-        INSERT INTO tblwaringnotes(handlestate,warningtype,warninglink,bagcode,kid,
-        wcase,wtime,hid) VALUES
+        INSERT INTO tblwaringnotes(handlestate,warningtype,warninglink,bagcode,kid,wcase,wtime,hid) VALUES
         <foreach collection="list" item="item" separator=",">
             (#{item.handlestate},#{item.warningtype},#{item.warninglink},#{item.bagcode},#{item.kid},
             #{item.wcase},#{item.wtime},#{item.hid})
         </foreach>
     </insert>
+
     <select id="findAll" resultMap="waringMap">
         select wn.noteid,wn.handlestate,hi.hname,dm.dname,td.dataname
         from tblwaringnotes wn left join tblhospitalinfo hi on hi.hid=wn.hid
@@ -21,6 +21,7 @@
         where wn.handlestate = 0
         order by wn.noteid desc
     </select>
+
     <resultMap id="waringMap" type="Tblwaringnotes">
         <id property="noteid" column="noteid"></id>
         <result property="handlestate" column="handlestate"></result>
@@ -42,7 +43,7 @@
         bagcode,hid,wcase,wtime,kid) VALUES
         <foreach collection="map.medicaltypeList" item="item" separator=",">
             (#{map.handlestate},#{map.warningtype},#{map.warninglink},
-            #{item.bagcode},#{item.hid},#{map.wcase},#{map.dateStr},#{item.did})
+            #{item.bagcode},#{item.hid},#{map.wcase},#{map.nowdate},#{item.did})
         </foreach>
     </insert>
 

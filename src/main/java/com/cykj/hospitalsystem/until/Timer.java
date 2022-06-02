@@ -110,9 +110,10 @@ public class Timer {
         }
     }
 
+    int a = 0;
+    int b = 0;
     // 入库超时的预警    入库是收集之后没有及时入库的
     public void getWarningTime(Tblwarning tblwarning){
-
         //获得当前系统前一个小时的时间
         Calendar c = Calendar.getInstance();
         c.setTime(new Date());
@@ -136,6 +137,7 @@ public class Timer {
             //循环遍历获得收集预警的数据
             String nowdate = DateFormat.getDateTimeInstance().format(new Date());
             for (Tblmedicaltype tblmedicaltype : list) {
+                b++;
                 Long getTime = null;
                 try {
                     getTime = Long.parseLong(dateToStamp(nowdate))-Long.parseLong(dateToStamp(tblmedicaltype.getCollectdate()));
@@ -144,16 +146,20 @@ public class Timer {
                 }
                 Long houer = Long.valueOf(timeInt*3600000);
                 if (getTime>=houer && getTime!=null){
+                    a++;
+                    System.out.println("wl"+a);
                     String bagcode = tblmedicaltype.getBagcode();
                     int did = (int) tblmedicaltype.getDid();
                     //  每一条 收集的数据    都会生成一条预警消息
                     int hid = (int) tblmedicaltype.getHid();
                     Tblwaringnotes tblwaringnotes = new Tblwaringnotes(0, 29, 34, bagcode, did, "入库超时预警", nowdate,hid);
+                    System.out.println(JSONObject.toJSONString(tblwaringnotes)+"ko");
                     wlist.add(tblwaringnotes);
                     tblmedicaltypeService.warningstatus((int) tblmedicaltype.getInfoid());
-                    int i = tblwaringnotesService.addnote(wlist);
                 }
+                System.out.println("wk"+a);
             }
+            int i = tblwaringnotesService.addnote(wlist);
         }
 
     }
@@ -165,6 +171,7 @@ public class Timer {
         String Carweight = tblwarning.getCarweight();//收集车重量
 
         String Removeboxkg = tblwarning.getRemoveboxkg();//是否去除箱重量
+
         String Boxkg = tblwarning.getBoxkg();//箱重
         Long Peelnum = tblwarning.getPeelnum();//去皮个数
         String Bagerror = tblwarning.getBagerror();//允许误差20%，取到20，则代表20%
@@ -201,6 +208,7 @@ public class Timer {
         if (medicaltypeList.size() > 0) {
             System.out.println("没跳出");
             tblwaringnotesMapper.delInStockWeightWaring(map);//先清空，预警信息表中，入库环节重量预警的信息
+            System.out.println(JSONObject.toJSONString(map)+"qqq");
             tblwaringnotesMapper.addnoteByMap(map); // 然后再重新添加，重量预警的信息
             //批量设置 收集表，入库重量异常的状态，将tblmedicaltype表的spare1设置为1.
             map.put("spare1",1);

@@ -194,10 +194,11 @@ public class TblmedicaltypeServiceImpl implements TblmedicaltypeService {
         }
         return map;
     }
-//改
+    //改
     @Override
     public Map<String, Object> upSaveid(Map<String, Object> map) {
         int i = tblmedicaltypeMapper.upSaveid(map);
+        System.out.println(map.get("saveid")+"#$RT"+JSONObject.toJSONString(map));
         if (i >= 1) {
             map.put("code", 1);
             map.put("msg", "补关联入库" + "成功!");
