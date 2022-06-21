@@ -21,6 +21,7 @@ public class Tblmedicaltype {
   private String spare2;
   private String spare1;
   private long infraction;
+  private String spare3;
 
 
 
@@ -32,6 +33,13 @@ public class Tblmedicaltype {
     this.infoid = infoid;
   }
 
+  public String getSpare3() {
+    return spare3;
+  }
+
+  public void setSpare3(String spare3) {
+    this.spare3 = spare3;
+  }
 
   public long getState() {
     return state;

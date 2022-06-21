@@ -19,8 +19,8 @@ public class StockOutServiceImpl implements StockOutService {
 
     // 查询医废入库信息
     @Override
-    public List<StockOut> queryStockInInfo(Map map) {
-        return stockOutMapper.queryStockInInfo(map);
+    public List<StockOut> queryStockOutInfo(Map map) {
+        return stockOutMapper.queryStockOutInfo(map);
     }
     // 查询医废入库信息总条数
     @Override

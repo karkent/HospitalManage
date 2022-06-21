@@ -121,7 +121,7 @@ public class medicaltypeController {
     @RequestMapping("/HandaddDate")
     @ResponseBody
     public Map<String, Object> HandaddDate(@RequestBody Map<String, Object> map){
-        System.out.println(":手工登记增加:");
+//        System.out.println(":手工登记增加:");
         return tblmedicaltypeService.HandaddDate(map);
     }
 

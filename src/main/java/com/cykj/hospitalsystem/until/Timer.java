@@ -159,12 +159,14 @@ public class Timer {
                 }
                 System.out.println("wk"+a);
             }
-            int i = tblwaringnotesService.addnote(wlist);
+            System.out.println(wlist=null);
+            System.out.println(wlist+"@$#@$");
+            if (wlist!=null){
+                int i = tblwaringnotesService.addnote(wlist);
+            }
         }
 
     }
-
-
 
     public void weightWarning(Tblwarning tblwarning){
         //根据重量的预警设置，获得预警提示

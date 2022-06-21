@@ -14,4 +14,6 @@ public interface TblwaringnotesService {
     List<Tblwaringnotes> findParam(Map<String,Object> map);
     int findParamCount(Map<String,Object> map);
     int updateHandle(Map<String,Object> map);
+
+    Map<String,Object> allShowMsg(Map<String,Object> map);
 }

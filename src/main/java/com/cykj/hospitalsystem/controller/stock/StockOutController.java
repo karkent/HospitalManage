@@ -25,11 +25,11 @@ public class StockOutController {
     private StockOutService stockOutServiceImpl;
 
     //查询医废入库信息
-    @RequestMapping("/queryStockInInfo")
+    @RequestMapping("/queryStockOutInfo")
     @ResponseBody
     public Map queryStockInInfo(@RequestBody Map map){
         // 查询医废入库信息
-        List<StockOut> list = stockOutServiceImpl.queryStockInInfo(map);
+        List<StockOut> list = stockOutServiceImpl.queryStockOutInfo(map);
         // 查询医废入库信息总条数
         int count = stockOutServiceImpl.queryStockInInfoCount(map);
         Map map1 = new HashMap();

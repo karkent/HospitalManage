@@ -325,6 +325,14 @@
         </where>
     </select>
 
+    <select id="findTrashIn" resultType="com.cykj.hospitalsystem.bean.Tblmedicaltype">
+        select weight,infoid from tblmedicaltype
+        where infoid in
+        <foreach item="item" index="index" collection="map.SaveIdArray" open="(" separator="," close=")">
+            ${item}
+        </foreach>
+    </select>
+
     <!--科室医疗废物记录表 -->
     <select id="table" parameterType="Map" resultType="Viewmedicaltype">
         select dname,did,weight,tname,typeid,sname2,sname,boxcode from viewmedicaltype

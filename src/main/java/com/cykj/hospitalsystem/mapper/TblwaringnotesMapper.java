@@ -11,7 +11,6 @@ import java.util.Map;
 @Repository
 public interface TblwaringnotesMapper {
 
-
       int addnote(List<Tblwaringnotes> list);
 
       List<Tblwaringnotes> findAll();
@@ -39,4 +38,18 @@ public interface TblwaringnotesMapper {
       int findParamCount(Map<String,Object> map);
 
       int updateHandle(Map<String,Object> map);
+
+      List<Tblmedicaltype> years(String yearTime);
+
+      List<Tblmedicaltype> weightSort(String yearTime);
+
+      List<Tblmedicaltype> sevenDay();
+
+      List<Tblmedicaltype> disease();
+
+      List<Tblmedicaltype> realTimeCollecting();
+
+      List<Tblmedicaltype> officeRealTimeCollecting();
+
+      List<Tblmedicaltype> dayWeekProportion(String dayWeek);
 }

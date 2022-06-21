@@ -40,9 +40,16 @@ public class DashboardController {
     // 首页 轮循请求
     @RequestMapping("/realTime")
     @ResponseBody
-    public Map realTime(@RequestBody Map<String,Object> map){
-        map.put("msg","消息");
-        return KTool.codeToclient(map);
+    public Map<String,Object> realTime(@RequestBody Map<String,Object> map){
+        System.out.println("{}{}{}{");
+        return tblwaringnotesServiceImpl.allShowMsg(map);
+    }
+
+    @RequestMapping("/totalWeight")
+    @ResponseBody // 预警弹窗表格 下一页功能，直接调用map层，没什么业务逻辑。
+    public Map totalWeight(@RequestBody Map<String,Object> map){
+        System.out.println(123);
+        return tblwaringnotesServiceImpl.allShowMsg(map);
     }
 
     @RequestMapping("/initWaring")

@@ -49,6 +49,8 @@ public interface TblmedicaltypeMapper {
 
     String findSumtable(Map<String, Object> map);
 
+    List<Tblmedicaltype> findTrashIn(@Param(value = "map") Map<String, Object> map);
+
     // 科室医疗废物记录表
     List<Viewmedicaltype> table(Map<String, Object> map);
     List<TrashTable> findbox(Map<String, Object> map);

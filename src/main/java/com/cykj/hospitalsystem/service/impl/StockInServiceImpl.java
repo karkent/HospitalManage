@@ -29,6 +29,7 @@ public class StockInServiceImpl implements StockInService {
         List<StockIn> list = stockInMapper.queryStockInInfo(map);
         return list;
     }
+
     // 查询医废入库信息总条数
     @Override
     public int queryStockInInfoCount(Map map) {

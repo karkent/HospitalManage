@@ -2,7 +2,6 @@ package com.cykj.hospitalsystem.service.impl;
 
 
 
-import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.cykj.hospitalsystem.bean.*;
 import com.cykj.hospitalsystem.mapper.*;
@@ -197,7 +196,20 @@ public class TblmedicaltypeServiceImpl implements TblmedicaltypeService {
     //改
     @Override
     public Map<String, Object> upSaveid(Map<String, Object> map) {
+
+        List<Tblmedicaltype> tblmedicaltypes = tblmedicaltypeMapper.findTrashIn(map);
+        Map<String,Object> map1 = null;
+        for (Tblmedicaltype t : tblmedicaltypes) {
+            System.out.println(JSONObject.toJSONString(t)+"@#$");
+            map1 = new HashMap<>();
+            map1.put("infoid",t.getInfoid());
+            map1.put("weight",t.getWeight());
+            map1.put("joinid",map.get("adminid"));
+            map1.put("collectdate",KTool.todayTime());
+            stockInMapper.addMedicalIn(map1);
+        }
         int i = tblmedicaltypeMapper.upSaveid(map);
+
         System.out.println(map.get("saveid")+"#$RT"+JSONObject.toJSONString(map));
         if (i >= 1) {
             map.put("code", 1);
@@ -218,15 +230,18 @@ public class TblmedicaltypeServiceImpl implements TblmedicaltypeService {
     //改
     @Override
     public Map<String, Object> HandaddDate(Map<String, Object> map) {
+
+        Object adminId = map.get("adminid");
         map.put("infraction", 0);
         map.put("warningisno", 0);
         tblmedicaltypeMapper.HandaddDate(map);
         map.put("infoid", tblmedicaltypeMapper.findSumtable(map));
 
+        map.put("joinid",adminId);
         stockInMapper.addMedicalIn(map);
         map.put("msg", "手工登记成功");
 
-        // Tblboxcode 状态设置成  已入库
+//         Tblboxcode 状态设置成  已入库
         map.put("bstate", 26);
         String boxidArry[] = {tblboxMapper.getIdbyBoxcode(map.get("boxcode").toString())};
         map.put("boxidArry", boxidArry);

@@ -17,7 +17,7 @@ import java.util.Map;
 @Repository
 public interface StockOutMapper {
     //查询医废入库信息
-    List<StockOut> queryStockInInfo(Map map);
+    List<StockOut> queryStockOutInfo(Map map);
 
     // 查询医废入库信息总条数
     int queryStockInInfoCount(Map map);

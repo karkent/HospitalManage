@@ -19,6 +19,7 @@
                 and state = #{state}
             </if>
         </where>
+        and dataname != "已出库" and dataname!="科室确认"
         limit #{nowPage} , #{pageSize}
     </select>
 

@@ -2,6 +2,7 @@ package com.cykj.hospitalsystem.service.impl;
 
 import ch.qos.logback.core.net.SyslogOutputStream;
 import com.alibaba.fastjson.JSONObject;
+import com.cykj.hospitalsystem.bean.Tblmedicaltype;
 import com.cykj.hospitalsystem.bean.Tblwaringnotes;
 import com.cykj.hospitalsystem.controller.WebSocketServer;
 import com.cykj.hospitalsystem.mapper.TblwaringnotesMapper;
@@ -23,7 +24,8 @@ public class TblwaringnotesServiceImpl implements TblwaringnotesService {
 
     @Override
     public int addnote(List<Tblwaringnotes> list) {
-        return tblwaringnotesMapper.addnote(list);
+        int a = tblwaringnotesMapper.addnote(list);
+        return a;
     }
 
     @Override
@@ -108,5 +110,82 @@ public class TblwaringnotesServiceImpl implements TblwaringnotesService {
     public int updateHandle(Map<String, Object> map) {
         return tblwaringnotesMapper.updateHandle(map);
 
+    }
+
+    @Override
+    public Map<String, Object> allShowMsg(Map<String,Object> map) {
+        map = new HashMap<>();
+        //获取年获取月总重量
+        Double yearWeight = 0.00;
+        Double monthWeight = 0.00;
+        Double dayWeight = 0.00;
+
+        List<Tblmedicaltype> tblmedicaltypes = tblwaringnotesMapper.years(KTool.getYearStartTime());
+        for (Tblmedicaltype m:tblmedicaltypes) {
+            //获取年
+            yearWeight = KTool.add(yearWeight,Double.valueOf(m.getWeight()));
+            try {
+                m.setCollectdate(String.valueOf(KTool.dayToTimeInMillis(m.getCollectdate())));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            //获取月
+            if (Long.valueOf(m.getCollectdate()) >= KTool.getMonthStartTime()){
+                monthWeight = KTool.add(monthWeight,Double.valueOf(m.getWeight()));
+            }
+            //获取日
+            if (Long.valueOf(m.getCollectdate()) >= KTool.getTodayZeroPointTimestamps()){
+                dayWeight = KTool.add(dayWeight,Double.valueOf(m.getWeight()));
+            }
+        }
+        //年医废收集排序 三个
+        List<Tblmedicaltype> tblMSort = tblwaringnotesMapper.weightSort(KTool.getYearStartTime());
+        int a = 0;
+        for (Tblmedicaltype t : tblMSort){
+            t.setInfoid(a++);
+        }
+        //近三天七天
+        List<Tblmedicaltype> seven = null;
+        List<Tblmedicaltype> disease = null;
+        try {
+            disease = KTool.bubbleSort(tblwaringnotesMapper.disease());
+            seven = KTool.bubbleSort(tblwaringnotesMapper.sevenDay());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        //三天
+        List<Tblmedicaltype> three = seven.subList(4,7);
+        System.out.println(three.size());
+
+        //实时收集数据 15个人员
+        List<Tblmedicaltype> peopleRealTimeCollecting = tblwaringnotesMapper.realTimeCollecting();
+        for (Tblmedicaltype r:peopleRealTimeCollecting){
+           r.setSpare3(KTool.protectedName(r.getSpare3()));
+        }
+        //科室
+        List<Tblmedicaltype> officeRealTimeCollecting = tblwaringnotesMapper.officeRealTimeCollecting();
+        for (Tblmedicaltype r:officeRealTimeCollecting){
+            r.setSpare3(KTool.protectedName(r.getSpare3()));
+        }
+        //周 日 医废占比
+        List<Tblmedicaltype> weekProportion = tblwaringnotesMapper.dayWeekProportion(KTool.getNextDay
+                (KTool.timeInMillisToDay(KTool.getTodayZeroPointTimestamps()),-6)+" 00:00:00");
+        List<Tblmedicaltype> dayProportion = tblwaringnotesMapper.dayWeekProportion(KTool.timeInMillisToDay
+                (KTool.getTodayZeroPointTimestamps()));
+        map.put("code",1);
+        map.put("yearWeight",yearWeight);
+        map.put("monthWeight",monthWeight);
+        map.put("dayWeight",dayWeight);
+        map.put("tblMSort",tblMSort);
+        map.put("seven",seven);
+        map.put("three",three);
+        map.put("realTimeCollecting",peopleRealTimeCollecting);
+        map.put("officeRealTimeCollecting",officeRealTimeCollecting);
+        map.put("weekProportion",weekProportion);
+        map.put("dayProportion",dayProportion);
+        map.put("disease",disease);
+        System.out.println(JSONObject.toJSONString(map.get("disease")+"/*-"));
+        return map;
     }
 }

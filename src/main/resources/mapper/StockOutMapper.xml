@@ -5,7 +5,7 @@
 <mapper namespace="com.cykj.hospitalsystem.mapper.StockOutMapper">
 
     <!-- 查询医废入库信息 -->
-    <select id="queryStockInInfo" resultType="StockOut" parameterType="Map">
+    <select id="queryStockOutInfo" resultType="StockOut" parameterType="Map">
         select * from stock_out where state = (select dataid from tbldata where dataname = '已出库' and pid = 5)
             <if test="hname != null and hname != '' and hname gt 0">
                 and hid = #{hname}
@@ -19,6 +19,7 @@
             <if test="outbatchnum != null and outbatchnum != ''">
                 and outbatchnum like CONCAT(CONCAT('%',#{outbatchnum}),'%')
             </if>
+            and dataname = "已出库"
         limit #{nowPage} , #{pageSize}
     </select>
 

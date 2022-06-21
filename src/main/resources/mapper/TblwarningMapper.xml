@@ -8,6 +8,7 @@
     <select id="warningconfig" resultType="Tblwarning">
         select  * from  tblwarning
     </select>
+
     <update id="savaWarning" parameterType="Map">
         update tblwarning
         <set>
