@@ -64,6 +64,7 @@
         or (tt.enterweight) &gt; (tmt.weight*#{frontNum})
          )
         and (tmt.spare1 &lt;&gt; 1 or tmt.spare1 is null)
+        and tt.enterweight !=tmt.weight
     </select>
 
 
@@ -75,6 +76,7 @@
         or (tmt.weight-#{delKg}) &gt; (tt.outweight*#{rearNum})
          )
         and (tmt.spare2 &lt;&gt; 1 or tmt.spare2 is null)
+        and tt.outweight != tmt.weight
     </select>
 
 </mapper>

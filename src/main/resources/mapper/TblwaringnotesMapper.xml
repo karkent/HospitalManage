@@ -46,7 +46,7 @@
         bagcode,hid,wcase,wtime,kid) VALUES
         <foreach collection="map.medicaltypeList" item="item" separator=",">
             (#{map.handlestate},#{map.warningtype},#{map.warninglink},
-            #{item.bagcode},#{item.hid},#{map.wcase},#{map.nowdate},#{item.did})
+            #{item.bagcode},#{item.hid},#{map.wcase},#{map.dateStr},#{item.did})
         </foreach>
     </insert>
 

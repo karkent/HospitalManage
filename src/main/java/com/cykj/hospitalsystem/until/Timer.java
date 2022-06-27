@@ -77,7 +77,8 @@ public class Timer {
         c.set(Calendar.HOUR_OF_DAY, c.get(Calendar.HOUR_OF_DAY) - timeInt);
         String dateStr = DateFormat.getDateTimeInstance().format(c.getTime());
         String nowdate = DateFormat.getDateTimeInstance().format(new Date());
-        System.out.println(dateStr+"@@"+nowdate);
+
+        System.out.println(dateStr+"!@WSX"+nowdate);
         Map<String,Object> map = new HashMap<>();
         map.put("dateStr",dateStr);
         // 获得交接超时的 列表，返回的是收集列表的集合
@@ -98,9 +99,9 @@ public class Timer {
                     map.put("warningtype",30); // 交接超时预警 也就是出库超时
                     map.put("warninglink",35); // 环节  出库
                     map.put("wcase","出库超时异常"); // 环节  入库
-                    map.put("dateStr",dateStr);
+                    map.put("dateStr",nowdate);
                     map.put("medicaltypeList",medicaltypeList);
-                    System.out.println(JSONObject.toJSONString(map));
+                    System.out.println(JSONObject.toJSONString(map)+"@#$@$");
                     tblwaringnotesMapper.delOutStockOvertimeWaring();//先清空，预警信息表中，所有交接预警的信息
                     tblwaringnotesMapper.addnoteByMap(map); // 然后再重新添加，重量预警的信息
                     //批量设置 入库表中，入库异常的预警状态，将tbltrashin表的spare1设置为1.
@@ -114,6 +115,7 @@ public class Timer {
     int b = 0;
     // 入库超时的预警    入库是收集之后没有及时入库的
     public void getWarningTime(Tblwarning tblwarning){
+
         //获得当前系统前一个小时的时间
         Calendar c = Calendar.getInstance();
         c.setTime(new Date());
@@ -183,9 +185,10 @@ public class Timer {
             bagerrorDouble = Double.valueOf(Bagerror); // 将字符串转换成双精度
         }
 
-        double frontNum = (100 + bagerrorDouble) * 0.01; // 用于传入数据库做 误差的计算
-        double rearNum = (100 - bagerrorDouble) * 0.01;
-
+        double frontNum = KTool.mul((100 + bagerrorDouble),0.01); // 用于传入数据库做 误差的计算
+        System.out.println(frontNum+"#$%");
+        double rearNum = KTool.mul((100 - bagerrorDouble),0.01);
+        System.out.println(rearNum+"#$%");
         double delKg = Double.valueOf(Carweight);
 
         if (Removeboxkg.equals("是")) {
@@ -197,14 +200,13 @@ public class Timer {
         map.put("rearNum", rearNum);
         // 可以查出 所有超重预警的收集列表
         List<Tblmedicaltype> medicaltypeList = tblwarningMapper.StockInWeightCheck(map);
-        System.out.println(JSONObject.toJSONString(medicaltypeList)+"@@@@");
 
         String nowdate = DateFormat.getDateTimeInstance().format(new Date());
         map.put("handlestate",0); // 默认 未处理
         map.put("warningtype",31); // 重量异常
         map.put("warninglink",34); // 环节  入库
         map.put("wcase","入库重量异常"); // 环节  入库
-        map.put("nowdate",nowdate);
+        map.put("dateStr",nowdate);
         map.put("medicaltypeList",medicaltypeList);
 
         if (medicaltypeList.size() > 0) {
@@ -223,6 +225,7 @@ public class Timer {
         map.put("warninglink",35); // 环节  出库
         map.put("wcase","出库重量异常"); // 环节  出库
         map.put("medicaltypeList",OutweightList); // 集合覆盖，在执行，添加 出库异常预警的信息
+        map.put("dateStr",nowdate);
         if (OutweightList.size() > 0 ){
             tblwaringnotesMapper.delInStockWeightWaring(map);//先清空，预警信息表中，出库环节重量预警的信息
             tblwaringnotesMapper.addnoteByMap(map); // 然后再重新添加，重量预警的信息

@@ -304,12 +304,24 @@ public class KTool {
 
 
     /*
-     *Double精确计算
+     *Double精确计算相加
      */
     public static Double add(Double value1, Double value2) {
         BigDecimal b1 = new BigDecimal(Double.toString(value1));
         BigDecimal b2 = new BigDecimal(Double.toString(value2));
         return new Double(b1.add(b2).doubleValue());
+    }
+    /**
+     * * 两个Double数相乘 *
+     *
+     * @param v1 *
+     * @param v2 *
+     * @return Double
+     */
+    public static Double mul(Double v1, Double v2) {
+        BigDecimal b1 = new BigDecimal(v1.toString());
+        BigDecimal b2 = new BigDecimal(v2.toString());
+        return new Double(b1.multiply(b2).doubleValue());
     }
 
     /**

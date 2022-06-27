@@ -20,6 +20,8 @@
                 and outbatchnum like CONCAT(CONCAT('%',#{outbatchnum}),'%')
             </if>
             and dataname = "已出库"
+            order by collectdate desc
+
         limit #{nowPage} , #{pageSize}
     </select>
 
