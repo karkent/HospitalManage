@@ -177,7 +177,7 @@ public class Timer {
         Long Peelnum = tblwarning.getPeelnum();//去皮个数
         String Bagerror = tblwarning.getBagerror();//允许误差20%，取到20，则代表20%
         double bagerrorDouble = 10;//默认20
-        System.out.println(Carweight+"!"+Removeboxkg+"@"+Boxkg+"@"+Peelnum+"@"+bagerrorDouble);
+
         if (Bagerror != null || !Bagerror.equals("")) {
             bagerrorDouble = Double.valueOf(Bagerror); // 将字符串转换成双精度
         }
