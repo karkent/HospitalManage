@@ -159,10 +159,7 @@ public class Timer {
                     wlist.add(tblwaringnotes);
                     tblmedicaltypeService.warningstatus((int) tblmedicaltype.getInfoid());
                 }
-                System.out.println("wk"+a);
             }
-            System.out.println(wlist=null);
-            System.out.println(wlist+"@$#@$");
             if (wlist!=null){
                 int i = tblwaringnotesService.addnote(wlist);
             }
@@ -186,9 +183,7 @@ public class Timer {
         }
 
         double frontNum = KTool.mul((100 + bagerrorDouble),0.01); // 用于传入数据库做 误差的计算
-        System.out.println(frontNum+"#$%");
         double rearNum = KTool.mul((100 - bagerrorDouble),0.01);
-        System.out.println(rearNum+"#$%");
         double delKg = Double.valueOf(Carweight);
 
         if (Removeboxkg.equals("是")) {
